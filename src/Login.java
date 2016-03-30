@@ -11,8 +11,8 @@ import javax.swing.JTextField;
 public class Login {
 
 	private JFrame frame;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField txtUsername;
+	private JTextField txtPassword;
 
 	/**
 	 * Launch the application.
@@ -46,46 +46,46 @@ public class Login {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
 		
-		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, "name_48817473655117");
-		panel.setLayout(null);
+		JPanel createRegistrarPanel = new JPanel();
+		frame.getContentPane().add(createRegistrarPanel, "name_48817473655117");
+		createRegistrarPanel.setLayout(null);
 		
 		JButton btnCreateRegistrar = new JButton("Create Registrar");
 		btnCreateRegistrar.setBounds(61, 87, 199, 46);
-		panel.add(btnCreateRegistrar);
+		createRegistrarPanel.add(btnCreateRegistrar);
 		
-		JPanel panel_1 = new JPanel();
-		frame.getContentPane().add(panel_1, "name_48894252615869");
-		panel_1.setLayout(null);
+		JPanel loginPanel = new JPanel();
+		frame.getContentPane().add(loginPanel, "name_48894252615869");
+		loginPanel.setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("Username : ");
 		lblNewLabel.setBounds(33, 94, 90, 26);
-		panel_1.add(lblNewLabel);
+		loginPanel.add(lblNewLabel);
 		
 		JLabel lblPassword = new JLabel("Password : ");
 		lblPassword.setBounds(33, 132, 102, 26);
-		panel_1.add(lblPassword);
+		loginPanel.add(lblPassword);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setBounds(178, 39, 158, 24);
-		panel_1.add(comboBox);
+		JComboBox cmbTypeUser = new JComboBox();
+		cmbTypeUser.setBounds(178, 39, 158, 24);
+		loginPanel.add(cmbTypeUser);
 		
 		JLabel lblTypeOfUser = new JLabel("Type of User : ");
 		lblTypeOfUser.setBounds(33, 38, 102, 26);
-		panel_1.add(lblTypeOfUser);
+		loginPanel.add(lblTypeOfUser);
 		
-		textField = new JTextField();
-		textField.setBounds(178, 94, 158, 26);
-		panel_1.add(textField);
-		textField.setColumns(10);
+		txtUsername = new JTextField();
+		txtUsername.setBounds(178, 94, 158, 26);
+		loginPanel.add(txtUsername);
+		txtUsername.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(178, 132, 158, 26);
-		panel_1.add(textField_1);
+		txtPassword = new JTextField();
+		txtPassword.setColumns(10);
+		txtPassword.setBounds(178, 132, 158, 26);
+		loginPanel.add(txtPassword);
 		
 		JButton btnLogin = new JButton("Login");
 		btnLogin.setBounds(33, 210, 117, 25);
-		panel_1.add(btnLogin);
+		loginPanel.add(btnLogin);
 	}
 }
