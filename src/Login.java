@@ -16,7 +16,7 @@ public class Login {
 	private JFrame frame;
 	private JTextField txtUsername;
 	private JTextField txtPassword;
-	private JPanel createRegistrarPanel;
+	private JPanel createRegistrarPanel, loginPanel;
 	private Lawyer l1, l2;
 	private JTextField txtRegUsername;
 	private JPasswordField pwdReg_1;
@@ -61,11 +61,9 @@ public class Login {
 		JButton btnCreateRegistrar = new JButton("Create Registrar");
 		btnCreateRegistrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				createRegistrarPanel.setVisible(false);
-				l1.initPanel();
-				frame.getContentPane().add(l1.getPanel());
-				l1.getPanel().setVisible(true);
 				
+				createRegistrarPanel.setVisible(false);
+				loginPanel.setVisible(true);
 				
 			}
 		});
@@ -101,7 +99,7 @@ public class Login {
 		lblRegistrarAccountCreation.setBounds(73, 12, 219, 15);
 		createRegistrarPanel.add(lblRegistrarAccountCreation);
 		
-		JPanel loginPanel = new JPanel();
+		loginPanel = new JPanel();
 		frame.getContentPane().add(loginPanel, "name_48894252615869");
 		loginPanel.setLayout(null);
 		
