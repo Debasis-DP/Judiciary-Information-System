@@ -9,14 +9,18 @@ public class Lawyer extends User {
 	private String l_id; //lawyer ID
 	private int no_of_views;
 	
+	
+	public Lawyer(String u, String p){
+		super(u, p, 'L');
+	}
+	
 	public void initPanel(){
 		super.initPanel();
 		
+		lblNoOfViews.setText("" + no_of_views);
+		
 	}
 	
-	public Lawyer(){
-		no_of_views = 0;
-	}
 	
 	
 }

@@ -56,6 +56,21 @@ public class DBConnect {
 		}
 	}
 	
+	public ResultSet getrs(String query){ //get result set
+		try{
+			rs = st.executeQuery(query);
+			//System.out.println(query+ ": success");
+			return rs;
+			
+		}catch(Exception ex){
+			System.out.println("Error : "+ ex);
+			
+		}
+		
+		return null;
+	}
+	
+	
 	public boolean checkTable(String tname, String dbname){
 		try{
 			String query = "show tables";

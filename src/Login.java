@@ -18,14 +18,16 @@ public class Login {
 
 	private JFrame frame;
 	private JTextField txtUsername;
-	private JTextField txtPassword;
+	private JPasswordField txtPassword;
 	private JPanel createRegistrarPanel, loginPanel;
 	private Lawyer l1, l2;
 	private JTextField txtRegUsername;
 	private JPasswordField pwdReg_1;
 	private JPasswordField pwdReg_2;
+	private JComboBox<String> cmbTypeUser;
 	
-	public static DBConnect db;
+	private JPanel CRPanel, URPanel, userPanel, casePanel;
+	public static DBConnect db = new DBConnect();
 	/**
 	 * Launch the application.
 	 */
@@ -40,8 +42,6 @@ public class Login {
 				}
 			}
 		});
-		
-		db = new DBConnect();
 		
 		if(! db.checkDB("jiss")){ //if database does not exist
 			
@@ -60,7 +60,10 @@ public class Login {
 		else
 			db.query("use jiss");
 		
-	
+		
+		
+		
+		
 		//db.update("drop database jiss");
 		
 	}
@@ -71,6 +74,21 @@ public class Login {
 	public Login() {
 		initialize();
 		
+		ResultSet rs = db.getrs("select * from users where type = \"R\"");
+		try{
+		
+			
+		
+			if(rs.next()){
+				System.out.println("not null:" + rs.getString("username"));
+				createRegistrarPanel.setVisible(false);
+				loginPanel.setVisible(true);
+			}else{
+				createRegistrarPanel.setVisible(true);
+				loginPanel.setVisible(false);
+			}
+		
+		}catch(Exception e){}
 	}
 
 	/**
@@ -88,17 +106,17 @@ public class Login {
 		
 		JButton btnCreateRegistrar = new JButton("Create Registrar");
 		btnCreateRegistrar.addActionListener(new ActionListener() {
-			@SuppressWarnings("deprecation")
+			
 			public void actionPerformed(ActionEvent e) {
 				
-				if(! pwdReg_1.getText().equals(pwdReg_2.getText())){
-					JOptionPane.showMessageDialog(frame, pwdReg_1.getText() + " : " + pwdReg_2.getText());
+				if(! String.valueOf(pwdReg_1.getPassword()).equals(String.valueOf(pwdReg_2.getPassword()))){
+					JOptionPane.showMessageDialog(frame, String.valueOf(pwdReg_1.getPassword()) + " : " + String.valueOf(pwdReg_2.getPassword()));
 					pwdReg_1.setText("");
 					pwdReg_2.setText("");
 					return;
 				}
 				
-				db.update("insert into users values (\"" + txtRegUsername.getText() + "\",\""  + pwdReg_1.getText() + "\", \"R\")");
+				db.update("insert into users values (\"" + txtRegUsername.getText() + "\",\""  + String.valueOf(pwdReg_1.getPassword()) + "\", \"R\")");
 				createRegistrarPanel.setVisible(false);
 				loginPanel.setVisible(true);
 				
@@ -148,7 +166,7 @@ public class Login {
 		lblPassword.setBounds(33, 132, 102, 26);
 		loginPanel.add(lblPassword);
 		
-		JComboBox<String> cmbTypeUser = new JComboBox<String>();
+		cmbTypeUser = new JComboBox<String>();
 		cmbTypeUser.addItem("Registrar");
 		cmbTypeUser.addItem("Lawyer");
 		cmbTypeUser.addItem("Judge");
@@ -164,12 +182,66 @@ public class Login {
 		loginPanel.add(txtUsername);
 		txtUsername.setColumns(10);
 		
-		txtPassword = new JTextField();
+		txtPassword = new JPasswordField();
 		txtPassword.setColumns(10);
 		txtPassword.setBounds(178, 132, 158, 26);
 		loginPanel.add(txtPassword);
 		
 		JButton btnLogin = new JButton("Log in");
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				ResultSet rs = db.getrs("select * from users where username = \"" + txtUsername.getText() + "\"");
+				try{
+					
+				
+					if(!rs.next()){
+						JOptionPane.showMessageDialog(frame, "Invalid username/password");
+						return;
+					}
+				
+					
+					if(! String.valueOf(txtPassword.getPassword()).equals(rs.getString("password"))){
+						JOptionPane.showMessageDialog(frame, "Invalid username/password");
+						return;
+					}
+					
+					char type = rs.getString("type").charAt(0);
+					int ch = cmbTypeUser.getSelectedIndex();
+					
+					if((type == 'R' && ch != 0) || (type == 'L' && ch != 1) || (type == 'J' && ch != 2)){
+						JOptionPane.showMessageDialog(frame, "Invalid username/password");
+						return;
+					}
+					switch(type){
+						case 'R':
+							Registrar reg = new Registrar(rs.getString("username"), rs.getString("password"));
+							reg.initPanel();
+							userPanel = reg.getPanel();
+							
+							
+							break;
+						case 'L':
+							Lawyer law = new Lawyer(rs.getString("username"), rs.getString("password"));
+							law.initPanel();
+							userPanel = law.getPanel();
+							
+							break;
+						case 'J':
+							Judge jud = new Judge(rs.getString("username"), rs.getString("password"));
+							jud.initPanel();
+							userPanel = jud.getPanel();
+							
+							
+					}
+					
+					frame.getContentPane().add(userPanel);
+					userPanel.setVisible(true);
+					loginPanel.setVisible(false);
+					
+				}catch(Exception ex){}
+			}
+		});
 		btnLogin.setBounds(33, 210, 117, 25);
 		loginPanel.add(btnLogin);
 		

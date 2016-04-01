@@ -11,7 +11,8 @@ import java.awt.event.ActionEvent;
 
 public class User{
 	
-	private String username, password, type;
+	private String username, password;
+	private char type;
 	
 	
 	private JPanel panel;
@@ -27,7 +28,13 @@ public class User{
 	private JPasswordField pwdNew_1;
 	private JPasswordField pwdNew_2;
 	
+	protected JLabel lblNoOfViews;
 	
+	public User(String u, String p, char t){
+		username = u;
+		password = p;
+		type = t;
+	}
 	
 	private int changePassword(){
 		if(! pwdOld.getPassword().toString().equals(password))
@@ -98,14 +105,29 @@ public class User{
 		btnUserManagement.setBounds(35, 410, 193, 25);
 		mainPanel.add(btnUserManagement);
 		
+		btnUserManagement.setEnabled(type == 'R');
 		JButton btnCaseManagement = new JButton("Case management");
+		btnCaseManagement.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		btnCaseManagement.setBounds(35, 447, 194, 25);
 		mainPanel.add(btnCaseManagement);
 		
+		btnCaseManagement.setEnabled(type == 'R');
 		JButton btnGo = new JButton("Go");
 		btnGo.setBounds(390, 46, 60, 25);
 		mainPanel.add(btnGo);
-			
+		
+		JLabel lblNumberOfCases = new JLabel("Number of cases viewed:");
+		lblNumberOfCases.setBounds(57, 76, 199, 15);
+		mainPanel.add(lblNumberOfCases);
+		lblNumberOfCases.setVisible(type == 'L');
+		lblNoOfViews = new JLabel("");
+		lblNoOfViews.setBounds(245, 77, 70, 15);
+		mainPanel.add(lblNoOfViews);
+		lblNoOfViews.setVisible(type == 'L');
 		
 		JLabel lblEnterOldPassword = new JLabel("Enter old password:");
 		lblEnterOldPassword.setBounds(35, 80, 186, 15);
@@ -167,12 +189,10 @@ public class User{
 		pwdNew_2.setBounds(214, 167, 139, 25);
 		pwdchangePanel.add(pwdNew_2);
 		
+		
+		
 	}
 	public JPanel getPanel(){
 		return panel;
 	}
-	
-//	public JPanel getMainPanel(){
-//		return mainPanel;
-//	}
 }

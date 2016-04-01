@@ -6,9 +6,11 @@ import javax.swing.JLabel;
 
 public class Registrar extends User {
 	
-	private JPanel regPanel;
+	//private JPanel;
 	
-	
+	public Registrar(String u, String p){
+		super(u, p, 'R');
+	}
 	
 	/**
 	 * @wbp.parser.entryPoint

@@ -6,6 +6,10 @@ import javax.swing.JTextField;
 
 public class Judge extends User{
 	
+	public Judge(String u, String p){
+		super(u, p, 'J');
+	}
+	
 	private String j_id; //judge ID
 	
 	
