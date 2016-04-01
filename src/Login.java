@@ -1,10 +1,13 @@
 import java.awt.EventQueue;
 
+import java.sql.*;
+
 import javax.swing.JFrame;
 import java.awt.CardLayout;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
@@ -21,6 +24,8 @@ public class Login {
 	private JTextField txtRegUsername;
 	private JPasswordField pwdReg_1;
 	private JPasswordField pwdReg_2;
+	
+	public static DBConnect db;
 	/**
 	 * Launch the application.
 	 */
@@ -35,6 +40,29 @@ public class Login {
 				}
 			}
 		});
+		
+		db = new DBConnect();
+		
+		if(! db.checkDB("jiss")){ //if database does not exist
+			
+			//create the databases and all tables
+			
+			db.update("create database jiss");
+			db.query("use jiss");
+			db.update("create table users (username varchar(20), password varchar(20), type char(1))");
+			db.update("create table cases (CIN int(8))");
+			db.update("create table hearings (CIN int(8), scheduled_date date, slot char(1), summary varchar(20))");
+			db.update("create table adjs (CIN int(8), scheduled_date date, slot char(1), reason varchar(20)) ");
+			
+			db.update("create table lawyers (username varchar(20), l_id int(8), no_of_views int(8))");
+			db.update("create table judges(username varchar(20), j_id int(8))");
+		}
+		else
+			db.query("use jiss");
+		
+	
+		//db.update("drop database jiss");
+		
 	}
 
 	/**
@@ -50,7 +78,7 @@ public class Login {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 500, 407);
+		frame.setBounds(100, 100, 500, 500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
 		
@@ -60,8 +88,17 @@ public class Login {
 		
 		JButton btnCreateRegistrar = new JButton("Create Registrar");
 		btnCreateRegistrar.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {
 				
+				if(! pwdReg_1.getText().equals(pwdReg_2.getText())){
+					JOptionPane.showMessageDialog(frame, pwdReg_1.getText() + " : " + pwdReg_2.getText());
+					pwdReg_1.setText("");
+					pwdReg_2.setText("");
+					return;
+				}
+				
+				db.update("insert into users values (\"" + txtRegUsername.getText() + "\",\""  + pwdReg_1.getText() + "\", \"R\")");
 				createRegistrarPanel.setVisible(false);
 				loginPanel.setVisible(true);
 				

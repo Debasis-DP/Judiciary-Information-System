@@ -8,10 +8,12 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTabbedPane;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class CasesRecord{
 	
-	private JPanel panel;
+	private JPanel panel, caseManPanel, queryPanel, createPanel;
 	private JTable tblCases;
 	private JTextField txtDefName;
 	private JTextField txtDefAddr;
@@ -25,6 +27,8 @@ public class CasesRecord{
 	private JTextField txtDateHearing;
 	private JTable tblQueryResult;
 	
+	private Case current; //the current Case object
+	
 	
 	/**
 	 * @wbp.parser.entryPoint
@@ -34,7 +38,7 @@ public class CasesRecord{
 		panel.setSize(500, 500);
 		panel.setLayout(new CardLayout(0, 0));
 		
-		JPanel caseManPanel = new JPanel();
+		caseManPanel = new JPanel();
 		panel.add(caseManPanel, "name_1122675107797");
 		caseManPanel.setLayout(null);
 		
@@ -62,7 +66,7 @@ public class CasesRecord{
 		btnQueryCase.setBounds(205, 447, 117, 25);
 		caseManPanel.add(btnQueryCase);
 		
-		JPanel queryPanel = new JPanel();
+		queryPanel = new JPanel();
 		panel.add(queryPanel, "name_1725993655147");
 		queryPanel.setLayout(null);
 		
@@ -143,6 +147,13 @@ public class CasesRecord{
 		queryPanel.add(tblQueryResult);
 		
 		JButton btnBack = new JButton("Back");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				queryPanel.setVisible(false);
+				caseManPanel.setVisible(true);
+				
+			}
+		});
 		btnBack.setBounds(34, 439, 117, 25);
 		queryPanel.add(btnBack);
 		
@@ -150,7 +161,7 @@ public class CasesRecord{
 		btnView.setBounds(177, 439, 117, 25);
 		queryPanel.add(btnView);
 		
-		JPanel createPanel = new JPanel();
+		createPanel = new JPanel();
 		panel.add(createPanel, "name_1914445518684");
 		createPanel.setLayout(null);
 		
