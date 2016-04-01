@@ -26,7 +26,11 @@ public class Login {
 	private JPasswordField pwdReg_2;
 	private JComboBox<String> cmbTypeUser;
 	
-	private JPanel CRPanel, URPanel, userPanel, casePanel;
+	private JPanel userPanel;
+	public static CasesRecord CR = new CasesRecord();
+	public static UsersRecord UR = new UsersRecord();
+	
+	
 	public static DBConnect db = new DBConnect();
 	/**
 	 * Launch the application.
@@ -54,8 +58,8 @@ public class Login {
 			db.update("create table hearings (CIN int(8), scheduled_date date, slot char(1), summary varchar(20))");
 			db.update("create table adjs (CIN int(8), scheduled_date date, slot char(1), reason varchar(20)) ");
 			
-			db.update("create table lawyers (username varchar(20), l_id int(8), no_of_views int(8))");
-			db.update("create table judges(username varchar(20), j_id int(8))");
+			db.update("create table lawyers (username varchar(20), no_of_views int(8))");
+			//db.update("create table judges(username varchar(20), j_id int(8))");
 		}
 		else
 			db.query("use jiss");

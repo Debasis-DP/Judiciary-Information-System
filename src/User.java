@@ -30,6 +30,7 @@ public class User{
 	
 	protected JLabel lblNoOfViews;
 	
+	private JPanel CRPanel, URPanel, casePanel;
 	public User(String u, String p, char t){
 		username = u;
 		password = p;
@@ -109,6 +110,13 @@ public class User{
 		JButton btnCaseManagement = new JButton("Case management");
 		btnCaseManagement.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				Login.CR.initPanel();
+				CRPanel = Login.CR.getPanel();
+				panel.add(CRPanel);
+				CRPanel.setVisible(true);
+				mainPanel.setVisible(false);
+				
 				
 			}
 		});

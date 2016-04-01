@@ -225,6 +225,10 @@ public class CasesRecord{
 		
 		
 	}
+	
+	public JPanel getPanel(){
+		return panel;
+	}
 	public void createCase(){
 		
 	}
