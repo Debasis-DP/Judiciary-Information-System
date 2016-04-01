@@ -15,17 +15,18 @@ import javax.swing.JTable;
 
 public class Case{
 	
-	private String def_name,
-				   def_addr, //defendant name and address
+	private String defName,
+				   defAddr, //defendant name and address
 				   type; //type of crime
-	private Date date_crime,
-				 date_hearing,
-				 date_start,
-				 date_expctd_cmpl;
-	private String location_crime,
-					arresting_officer,
-					presiding_judge,
-					public_pros;
+	private Date dateCrime,
+				 dateArrest,
+				 dateHearing,
+				 dateStart,
+				 dateExpctdCmpl;
+	private String location,
+					arrestingOfficer,
+					presidingJudge,
+					publicPros;
 	private int CIN;
 	private boolean status; //true for SCHEDULED, false for CLOSED
 	
@@ -47,15 +48,29 @@ public class Case{
 	private JTable tblHears;
 	private JTable tblAdjs;
 	
+	private JPanel hearingAssignPanel;
 	/**
 	 * @wbp.parser.entryPoint
 	 */
+	
+	public Case(int c, String dn, String da, Date dc, String t, String l, String na, Date dar){
+		CIN = c;
+		defName = dn;
+		defAddr = da;
+		type = t;
+		dateCrime = dc;
+		location = l;
+		arrestingOfficer = na;
+		dateArrest = dar;
+		
+		
+	}
 	public void initPanel(){
 		panel = new JPanel();
 		panel.setSize(500, 500);
 		panel.setLayout(new CardLayout(0, 0));
 		
-		JPanel hearingAssignPanel = new JPanel();
+		hearingAssignPanel = new JPanel();
 		panel.add(hearingAssignPanel, "name_3694238466770");
 		hearingAssignPanel.setLayout(null);
 		
@@ -312,6 +327,13 @@ public class Case{
 		historyPanel.add(btnBack);
 	}
 	
+	public JPanel getPanel(){
+		return panel;
+	}
+	
+	public JPanel getHearingPanel(){
+		return hearingAssignPanel;
+	}
 	public void adjourn(){
 		
 	}

@@ -14,7 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JPasswordField;
 
-public class Login {
+public class JISS {
 
 	private JFrame frame;
 	private JTextField txtUsername;
@@ -39,7 +39,7 @@ public class Login {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Login window = new Login();
+					JISS window = new JISS();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -75,7 +75,7 @@ public class Login {
 	/**
 	 * Create the application.
 	 */
-	public Login() {
+	public JISS() {
 		initialize();
 		
 		ResultSet rs = db.getrs("select * from users where type = \"R\"");

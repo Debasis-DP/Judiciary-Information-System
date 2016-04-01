@@ -88,6 +88,10 @@ public class UsersRecord{
 		txtPassword.setColumns(10);
 		
 	}
+	
+	public JPanel getPanel(){
+		return panel;
+	}
 	public void createUser(){
 		
 	}

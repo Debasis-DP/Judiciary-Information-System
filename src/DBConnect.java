@@ -87,4 +87,17 @@ public class DBConnect {
 		}
 		return false;
 	}
+	
+	public int queryCount(String query){
+		try{
+			rs = st.executeQuery(query);
+			System.out.println(query+ ": success");
+			
+			return rs.getInt(1);
+		}catch(Exception ex){
+			System.out.println("Error : "+ ex);
+			
+		}
+		return -1;
+	}
 }

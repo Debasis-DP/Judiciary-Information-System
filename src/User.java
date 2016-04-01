@@ -38,13 +38,13 @@ public class User{
 	}
 	
 	private int changePassword(){
-		if(! pwdOld.getPassword().toString().equals(password))
+		if(! String.valueOf(pwdOld.getPassword()).equals(password))
 			return 1;
-		else if(! pwdNew_1.getPassword().toString().equals(pwdNew_2.getPassword().toString())){
+		else if(! String.valueOf(pwdNew_1.getPassword()).equals(String.valueOf(pwdNew_2.getPassword()))){
 			return 2;
 		}
 		else{
-			password = pwdNew_1.getPassword().toString();
+			password = String.valueOf(pwdNew_1.getPassword());
 			return 0;
 		}
 	}
@@ -103,6 +103,15 @@ public class User{
 		mainPanel.add(lblLoggedUsername);
 		
 		JButton btnUserManagement = new JButton("User management");
+		btnUserManagement.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JISS.UR.initPanel();
+				URPanel = JISS.UR.getPanel();
+				panel.add(URPanel);
+				URPanel.setVisible(true);
+				mainPanel.setVisible(false);
+			}
+		});
 		btnUserManagement.setBounds(35, 410, 193, 25);
 		mainPanel.add(btnUserManagement);
 		
@@ -111,8 +120,8 @@ public class User{
 		btnCaseManagement.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				Login.CR.initPanel();
-				CRPanel = Login.CR.getPanel();
+				JISS.CR.initPanel();
+				CRPanel = JISS.CR.getPanel();
 				panel.add(CRPanel);
 				CRPanel.setVisible(true);
 				mainPanel.setVisible(false);

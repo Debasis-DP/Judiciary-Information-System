@@ -9,6 +9,9 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTabbedPane;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.awt.event.ActionEvent;
 
 public class CasesRecord{
@@ -17,7 +20,7 @@ public class CasesRecord{
 	private JTable tblCases;
 	private JTextField txtDefName;
 	private JTextField txtDefAddr;
-	private JTextField txtTypeCrime;
+	private JTextField txtTypeCrime, txtDateCrime;
 	private JTextField txtLocation;
 	private JTextField txtArrestingOffcr;
 	private JTextField txtDateArrest;
@@ -28,7 +31,7 @@ public class CasesRecord{
 	private JTable tblQueryResult;
 	
 	private Case current; //the current Case object
-	
+	private JPanel casePanel;
 	
 	/**
 	 * @wbp.parser.entryPoint
@@ -51,6 +54,12 @@ public class CasesRecord{
 		caseManPanel.add(lblListOfCases);
 		
 		JButton btnNewCase = new JButton("New case");
+		btnNewCase.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createPanel.setVisible(true);
+				caseManPanel.setVisible(false);
+			}
+		});
 		btnNewCase.setBounds(76, 400, 117, 25);
 		caseManPanel.add(btnNewCase);
 		
@@ -204,6 +213,11 @@ public class CasesRecord{
 		txtTypeCrime.setBounds(246, 127, 192, 19);
 		createPanel.add(txtTypeCrime);
 		
+		txtDateCrime = new JTextField();
+		txtDateCrime.setColumns(10);
+		txtDateCrime.setBounds(246, 127, 192, 19);
+		createPanel.add(txtDateCrime);
+		
 		txtLocation = new JTextField();
 		txtLocation.setColumns(10);
 		txtLocation.setBounds(246, 168, 192, 19);
@@ -219,9 +233,15 @@ public class CasesRecord{
 		txtDateArrest.setBounds(246, 253, 192, 19);
 		createPanel.add(txtDateArrest);
 		
-		JButton btnGenerateCin = new JButton("Generate CIN");
-		btnGenerateCin.setBounds(246, 393, 177, 25);
-		createPanel.add(btnGenerateCin);
+		JButton btnProceed = new JButton("Proceed");
+		btnProceed.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createCase();
+				
+			}
+		});
+		btnProceed.setBounds(246, 393, 177, 25);
+		createPanel.add(btnProceed);
 		
 		
 	}
@@ -230,6 +250,27 @@ public class CasesRecord{
 		return panel;
 	}
 	public void createCase(){
+		
+		Date dateCrime, dateArrest;
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		df.setLenient(false);
+		try{
+			dateCrime = df.parse(txtDateCrime.getText());
+			dateArrest = df.parse(txtDateArrest.getText());
+		
+			current = new Case(generateCIN(), txtDefName.getText(), txtDefAddr.getText(),
+				dateCrime, txtDateCrime.getText(),txtLocation.getText(), txtArrestingOffcr.getText(), dateArrest);
+		
+			
+		}catch(Exception e){}
+		
+		current.initPanel();
+		casePanel = current.getHearingPanel();
+		panel.add(casePanel);
+		
+		
+		createPanel.setVisible(false);
+		casePanel.setVisible(true);
 		
 	}
 	
@@ -243,6 +284,7 @@ public class CasesRecord{
 	
 	public int generateCIN(){
 		
-		return 0;
+		int c = JISS.db.queryCount("select count(*) from cases");
+		return (c+1);
 	}
 }
