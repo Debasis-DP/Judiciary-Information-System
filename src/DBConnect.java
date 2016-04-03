@@ -92,8 +92,9 @@ public class DBConnect {
 		try{
 			rs = st.executeQuery(query);
 			System.out.println(query+ ": success");
-			
+			rs.next();
 			return rs.getInt(1);
+			
 		}catch(Exception ex){
 			System.out.println("Error : "+ ex);
 			

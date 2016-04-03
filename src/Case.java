@@ -12,6 +12,11 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.JTable;
+import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.awt.event.ActionEvent;
 
 public class Case{
 	
@@ -48,24 +53,51 @@ public class Case{
 	private JTable tblHears;
 	private JTable tblAdjs;
 	
-	private JPanel hearingAssignPanel;
-	/**
-	 * @wbp.parser.entryPoint
-	 */
+	private JLabel lblCIN_;
+	private JLabel lblStatus_, lblDateHearing;
+	private JComboBox<String> cmbSlots;
 	
-	public Case(int c, String dn, String da, Date dc, String t, String l, String na, Date dar){
+	private JPanel hearingAssignPanel;
+	private JPanel viewPanel;
+	private JTextField txtDateArrest;
+	
+	private CasesRecord CR;
+	public Case(int c, String dn, String da, Date dc, String t, String l, String ao, Date dar){
 		CIN = c;
 		defName = dn;
 		defAddr = da;
 		type = t;
 		dateCrime = dc;
 		location = l;
-		arrestingOfficer = na;
+		arrestingOfficer = ao;
 		dateArrest = dar;
 		
+		status = false;
 		
 	}
-	public void initPanel(){
+	
+	public Case(int c, String dn, String da, Date dc, String t, String l, String ao, Date dar, String pj, String pp, Date dh, Date ds, Date dec, boolean s){
+		CIN = c;
+		defName = dn;
+		defAddr = da;
+		type = t;
+		dateCrime = dc;
+		location = l;
+		arrestingOfficer = ao;
+		dateArrest = dar;
+		presidingJudge = pj;
+		publicPros = pp;
+		dateHearing = dh;
+		dateStart = ds;
+		dateExpctdCmpl = dec;
+		status = s;
+	}
+	/**
+	 * @wbp.parser.entryPoint
+	 */
+	public void initPanel(CasesRecord cr){
+		
+		CR = cr;
 		panel = new JPanel();
 		panel.setSize(500, 500);
 		panel.setLayout(new CardLayout(0, 0));
@@ -88,14 +120,55 @@ public class Case{
 		txtDateHearing.setColumns(10);
 		
 		JButton btnGetVacantSlots = new JButton("Get vacant slots");
+		btnGetVacantSlots.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+//				DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+//				String dstr = df.format(date)
+				int[] slots = new int[3];
+				for(int i=0; i<3; i++)
+					slots[i] = 1;
+				ResultSet rs = JISS.db.getrs("select slot from hearings where scheduled_date = \"" + txtDateHearing.getText() + "\"");
+				try{
+					while(rs.next()){
+						if(rs.getString(1).equals("A")){
+							slots[0] = 0;
+						}else if(rs.getString(1).equals("B")){
+							slots[1] = 0;
+						}else{
+							slots[2] = 0;
+						}
+					}
+					
+					if(slots[0] == 1)
+						cmbSlots.addItem("A");
+					if(slots[1] == 1)
+						cmbSlots.addItem("B");
+					if(slots[2] == 1)
+						cmbSlots.addItem("C");
+				}catch(Exception ex){}
+			}
+		});
 		btnGetVacantSlots.setBounds(75, 161, 164, 25);
 		hearingAssignPanel.add(btnGetVacantSlots);
 		
-		JComboBox<String> cmbSlots = new JComboBox<String>();
+		cmbSlots = new JComboBox<String>();
 		cmbSlots.setBounds(214, 218, 121, 25);
 		hearingAssignPanel.add(cmbSlots);
 		
+		
 		JButton btnOk = new JButton("OK");
+		btnOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String sl = (String)cmbSlots.getSelectedItem();
+				JISS.db.update("insert into hearings values (" + CIN + ", \"" + txtDateHearing.getText() + "\", \"" + sl + "\", \"-\")");
+				
+				JISS.db.update("update cases set dateHearing=\"" + txtDateHearing.getText() + "\"");
+				dateHearing = JISS.getDate(txtDateHearing.getText());
+				hearingAssignPanel.setVisible(false);
+				viewPanel.setVisible(true);
+				loadViewPanel();
+			}
+		});
 		btnOk.setBounds(214, 328, 117, 25);
 		hearingAssignPanel.add(btnOk);
 		
@@ -103,7 +176,7 @@ public class Case{
 		lblCin.setBounds(75, 52, 70, 15);
 		hearingAssignPanel.add(lblCin);
 		
-		JLabel lblCin_ = new JLabel("New label");
+		JLabel lblCin_ = new JLabel("" + CIN);
 		lblCin_.setBounds(227, 52, 134, 15);
 		hearingAssignPanel.add(lblCin_);
 		
@@ -168,11 +241,30 @@ public class Case{
 		btnCancel_1.setBounds(180, 298, 117, 25);
 		closePanel.add(btnCancel_1);
 		
-		JPanel viewPanel = new JPanel();
+		viewPanel = new JPanel();
 		panel.add(viewPanel, "name_1078370647751");
 		viewPanel.setLayout(null);
 		
 		JButton btnSave = new JButton("Save");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				JISS.db.update("update cases set "+
+				"defName=\"" + txtDefName.getText() + "\", " +
+				"defAddr=\"" + txtDefAddr.getText() + "\", " +
+				"type=\"" + txtTypeCrime.getText() + "\", "+
+				"dateCrime=\"" + txtDateCrime.getText() + "\", "+
+				"location=\"" + txtLocation.getText() + "\", "+
+				"dateArrest=\"" + txtDateArrest.getText() + "\", "+
+				"dateStart=\"" + txtDateStarting.getText() + "\", "+
+				"dateComp=\"" + txtDateComp.getText() + "\", "+
+				"ao=\"" + txtArrestingOffcr.getText() + "\", "+
+				"pj=\"" + txtPresJudge.getText() + "\", " +
+				"pp=\"" + txtPublicPros.getText() + "\""	);
+				CR.backFromCase();
+			}
+			
+		});
 		btnSave.setBounds(66, 448, 68, 25);
 		viewPanel.add(btnSave);
 		
@@ -210,7 +302,7 @@ public class Case{
 		viewPanel.add(lblDateOfCrime);
 		
 		JLabel lblNameOfArresting = new JLabel("Name of arresting officer:");
-		lblNameOfArresting.setBounds(66, 189, 191, 15);
+		lblNameOfArresting.setBounds(66, 204, 191, 15);
 		viewPanel.add(lblNameOfArresting);
 		
 		JLabel lblNameOfPresiding = new JLabel("Name of presiding judge:");
@@ -259,7 +351,7 @@ public class Case{
 		
 		txtArrestingOffcr = new JTextField();
 		txtArrestingOffcr.setColumns(10);
-		txtArrestingOffcr.setBounds(255, 187, 174, 19);
+		txtArrestingOffcr.setBounds(255, 202, 174, 19);
 		viewPanel.add(txtArrestingOffcr);
 		
 		txtPresJudge = new JTextField();
@@ -282,11 +374,11 @@ public class Case{
 		txtDateComp.setBounds(255, 307, 114, 19);
 		viewPanel.add(txtDateComp);
 		
-		JLabel lblDateHearing = new JLabel("New label");
+		lblDateHearing = new JLabel("New label");
 		lblDateHearing.setBounds(255, 336, 114, 15);
 		viewPanel.add(lblDateHearing);
 		
-		JLabel lblStatus_ = new JLabel("New label");
+		lblStatus_ = new JLabel("New label");
 		lblStatus_.setBounds(255, 390, 114, 15);
 		viewPanel.add(lblStatus_);
 		
@@ -294,13 +386,22 @@ public class Case{
 		lblCin_1.setBounds(64, -1, 70, 15);
 		viewPanel.add(lblCin_1);
 		
-		JLabel lblCIN_ = new JLabel("New label");
+		lblCIN_ = new JLabel("New label");
 		lblCIN_.setBounds(255, 0, 174, 15);
 		viewPanel.add(lblCIN_);
 		
 		JButton btnCaseHistory = new JButton("Case history");
 		btnCaseHistory.setBounds(269, 417, 191, 25);
 		viewPanel.add(btnCaseHistory);
+		
+		JLabel lblDateOfArrest = new JLabel("Date of arrest:");
+		lblDateOfArrest.setBounds(66, 177, 132, 15);
+		viewPanel.add(lblDateOfArrest);
+		
+		txtDateArrest = new JTextField();
+		txtDateArrest.setColumns(10);
+		txtDateArrest.setBounds(255, 171, 114, 19);
+		viewPanel.add(txtDateArrest);
 		
 		JPanel historyPanel = new JPanel();
 		panel.add(historyPanel, "name_3221067023128");
@@ -325,14 +426,53 @@ public class Case{
 		JButton btnBack = new JButton("Back");
 		btnBack.setBounds(55, 463, 117, 25);
 		historyPanel.add(btnBack);
+		
+		loadViewPanel();
 	}
 	
 	public JPanel getPanel(){
+		
 		return panel;
 	}
 	
-	public JPanel getHearingPanel(){
-		return hearingAssignPanel;
+	public void goToHearing(){
+		hearingAssignPanel.setVisible(true);
+		viewPanel.setVisible(false);
+	}
+	public void goToView(){
+		hearingAssignPanel.setVisible(false);
+		viewPanel.setVisible(true);
+	}
+	
+//	public JPanel getHearingPanel(){
+//		return hearingAssignPanel;
+//	}
+	
+	public void loadViewPanel(){
+			
+		try{
+			
+			lblCIN_.setText("" + CIN);
+			
+			txtDefName.setText(defName);
+			txtDefAddr.setText(defAddr);
+			txtTypeCrime.setText(type);
+			txtLocation.setText(location);
+			txtArrestingOffcr.setText(arrestingOfficer);
+			txtDateCrime.setText(JISS.DtoS(dateCrime));
+			txtDateArrest.setText(JISS.DtoS(dateArrest));
+			txtDateStarting.setText(JISS.DtoS(dateStart));
+			txtDateComp.setText(JISS.DtoS(dateExpctdCmpl));
+			txtPresJudge.setText(presidingJudge);
+			txtPublicPros.setText(publicPros);
+			
+			lblDateHearing.setText(JISS.DtoS(dateHearing));
+			String stat;
+			if(!status) stat = "Pending";
+			else stat = "Closed";
+			lblStatus_.setText(stat);
+		
+		}catch(Exception e){}
 	}
 	public void adjourn(){
 		

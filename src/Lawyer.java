@@ -14,8 +14,8 @@ public class Lawyer extends User {
 		super(u, p, 'L');
 	}
 	
-	public void initPanel(){
-		super.initPanel();
+	public void initPanel(JISS p){
+		super.initPanel(p);
 		
 		lblNoOfViews.setText("" + no_of_views);
 		

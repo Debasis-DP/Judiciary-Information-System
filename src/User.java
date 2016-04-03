@@ -15,7 +15,7 @@ public class User{
 	private char type;
 	
 	
-	private JPanel panel;
+	protected JPanel panel;
 
 
 	protected JPanel mainPanel;
@@ -23,14 +23,15 @@ public class User{
 
 	private JPanel pwdchangePanel;
 	private JTextField txtKeywords;
-	private JTable table;
+	private JTable tblCases;
 	private JPasswordField pwdOld;
 	private JPasswordField pwdNew_1;
 	private JPasswordField pwdNew_2;
 	
 	protected JLabel lblNoOfViews;
 	
-	private JPanel CRPanel, URPanel, casePanel;
+	private JISS parent;
+	public JPanel CRPanel, URPanel, casePanel;
 	public User(String u, String p, char t){
 		username = u;
 		password = p;
@@ -52,8 +53,9 @@ public class User{
 	/**
 	 * @wbp.parser.entryPoint
 	 */
-	public void initPanel(){
+	public void initPanel(JISS p){
 		
+		parent = p;
 		panel = new JPanel();
 		panel.setSize(500,500);
 		panel.setLayout(new CardLayout(0, 0));
@@ -73,12 +75,17 @@ public class User{
 		txtKeywords.setColumns(10);
 		
 		JButton btnLogOut = new JButton("Log out");
+		btnLogOut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				parent.backFromUser();
+			}
+		});
 		btnLogOut.setBounds(371, 12, 117, 25);
 		mainPanel.add(btnLogOut);
 		
-		table = new JTable();
-		table.setBounds(57, 104, 393, 274);
-		mainPanel.add(table);
+		tblCases = new JTable();
+		tblCases.setBounds(57, 104, 393, 274);
+		mainPanel.add(tblCases);
 		
 		pwdchangePanel = new JPanel();
 		panel.add(pwdchangePanel, "name_1113697649244");
@@ -105,7 +112,7 @@ public class User{
 		JButton btnUserManagement = new JButton("User management");
 		btnUserManagement.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JISS.UR.initPanel();
+				JISS.UR.initPanel(getThis());
 				URPanel = JISS.UR.getPanel();
 				panel.add(URPanel);
 				URPanel.setVisible(true);
@@ -120,7 +127,7 @@ public class User{
 		btnCaseManagement.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				JISS.CR.initPanel();
+				JISS.CR.initPanel(getThis());
 				CRPanel = JISS.CR.getPanel();
 				panel.add(CRPanel);
 				CRPanel.setVisible(true);
@@ -177,6 +184,7 @@ public class User{
 				if(changePassword() == 0){
 					pwdchangePanel.setVisible(false);
 					mainPanel.setVisible(true);
+					JISS.db.update("update users set password=\"" + password + "\" where username = \"" + username + "\"");
 				}
 				else if(changePassword() == 1){
 					JOptionPane.showMessageDialog(panel, "Wrong old password!");
@@ -208,6 +216,24 @@ public class User{
 		
 		
 		
+	}
+	
+	public User getThis(){
+		return this;
+	}
+	
+	public void backFromUR(){
+		mainPanel.setVisible(true);
+		URPanel.setVisible(false);
+		panel.remove(URPanel);
+		URPanel = null;
+	}
+	
+	public void backFromCR(){
+		mainPanel.setVisible(true);
+		CRPanel.setVisible(false);
+		panel.remove(CRPanel);
+		CRPanel = null;
 	}
 	public JPanel getPanel(){
 		return panel;

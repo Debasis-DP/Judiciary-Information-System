@@ -15,8 +15,8 @@ public class Registrar extends User {
 	/**
 	 * @wbp.parser.entryPoint
 	 */
-	public void initPanel(){
-		super.initPanel();
+	public void initPanel(JISS p){
+		super.initPanel(p);
 		
 		
 		

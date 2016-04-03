@@ -1,6 +1,9 @@
 import java.awt.EventQueue;
 
+import java.util.Date;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import javax.swing.JFrame;
 import java.awt.CardLayout;
@@ -35,6 +38,25 @@ public class JISS {
 	/**
 	 * Launch the application.
 	 */
+	
+	public static Date getDate(String s){
+	
+		DateFormat df=  new SimpleDateFormat("dd/MM/yyyy");
+		try{
+			return df.parse(s);
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
+	public static String DtoS(Date d){
+		DateFormat df=  new SimpleDateFormat("dd/MM/yyyy");
+		try{
+			return df.format(d);
+		}catch(Exception e){
+			return null;
+		}
+	}
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -54,9 +76,11 @@ public class JISS {
 			db.update("create database jiss");
 			db.query("use jiss");
 			db.update("create table users (username varchar(20), password varchar(20), type char(1))");
-			db.update("create table cases (CIN int(8))");
-			db.update("create table hearings (CIN int(8), scheduled_date date, slot char(1), summary varchar(20))");
-			db.update("create table adjs (CIN int(8), scheduled_date date, slot char(1), reason varchar(20)) ");
+			db.update("create table cases (CIN int(8), defName varchar(20), defAddr varchar(40), type varchar(20), location varchar(20)"
+			+ ", ao varchar(20), dateCrime char (10), dateArrest char(10), dateHearing char(10), dateStart char(10), dateComp char(10)"
+			+ ", pj varchar(20), pp varchar(20), status boolean) ");
+			db.update("create table hearings (CIN int(8), scheduled_date char(10), slot char(1), summary varchar(20))");
+			db.update("create table adjs (CIN int(8), scheduled_date char(10), slot char(1), reason varchar(20)) ");
 			
 			db.update("create table lawyers (username varchar(20), no_of_views int(8))");
 			//db.update("create table judges(username varchar(20), j_id int(8))");
@@ -220,20 +244,20 @@ public class JISS {
 					switch(type){
 						case 'R':
 							Registrar reg = new Registrar(rs.getString("username"), rs.getString("password"));
-							reg.initPanel();
+							reg.initPanel(getThis());
 							userPanel = reg.getPanel();
 							
 							
 							break;
 						case 'L':
 							Lawyer law = new Lawyer(rs.getString("username"), rs.getString("password"));
-							law.initPanel();
+							law.initPanel(getThis());
 							userPanel = law.getPanel();
 							
 							break;
 						case 'J':
 							Judge jud = new Judge(rs.getString("username"), rs.getString("password"));
-							jud.initPanel();
+							jud.initPanel(getThis());
 							userPanel = jud.getPanel();
 							
 							
@@ -250,5 +274,18 @@ public class JISS {
 		loginPanel.add(btnLogin);
 		
 		
+	}
+	
+	public void backFromUser(){
+		loginPanel.setVisible(true);
+		userPanel.setVisible(false);
+		frame.getContentPane().remove(userPanel);
+		txtUsername.setText("");
+		txtPassword.setText("");
+		userPanel = null;
+	}
+	
+	private JISS getThis(){
+		return this;
 	}
 }

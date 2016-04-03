@@ -3,12 +3,14 @@ import java.awt.CardLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTabbedPane;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,10 +35,15 @@ public class CasesRecord{
 	private Case current; //the current Case object
 	private JPanel casePanel;
 	
+	private JScrollPane sp;
+	
+	private User accessor;
 	/**
 	 * @wbp.parser.entryPoint
 	 */
-	public void initPanel(){
+	public void initPanel(User ac){
+		
+		accessor = ac;
 		panel = new JPanel();
 		panel.setSize(500, 500);
 		panel.setLayout(new CardLayout(0, 0));
@@ -45,9 +52,12 @@ public class CasesRecord{
 		panel.add(caseManPanel, "name_1122675107797");
 		caseManPanel.setLayout(null);
 		
-		tblCases = new JTable();
-		tblCases.setBounds(76, 42, 335, 336);
-		caseManPanel.add(tblCases);
+		
+		loadTableCases();
+		//tblCases = new JTable();
+		sp = new JScrollPane(tblCases);
+		sp.setBounds(76, 42, 335, 336);
+		caseManPanel.add(sp);
 		
 		JLabel lblListOfCases = new JLabel("List of cases:");
 		lblListOfCases.setBounds(76, 12, 155, 15);
@@ -64,10 +74,31 @@ public class CasesRecord{
 		caseManPanel.add(btnNewCase);
 		
 		JButton btnEditCase = new JButton("Edit case");
+		btnEditCase.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int ch = tblCases.getSelectedRow();
+				System.out.println(ch);
+				String cin = (String) tblCases.getValueAt(ch, 0);
+				int cin_ = Integer.parseInt(cin);
+				System.out.println("cin_ = " + cin_);
+				Case case_ = getCase(cin_);
+				case_.initPanel(getThis());
+				casePanel = case_.getPanel();
+				panel.add(casePanel);
+				casePanel.setVisible(true);
+				caseManPanel.setVisible(false);
+				case_.goToView();
+			}
+		});
 		btnEditCase.setBounds(205, 400, 117, 25);
 		caseManPanel.add(btnEditCase);
 		
 		JButton btnBack_1 = new JButton("Back");
+		btnBack_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				accessor.backFromCR();
+			}
+		});
 		btnBack_1.setBounds(76, 447, 117, 25);
 		caseManPanel.add(btnBack_1);
 		
@@ -195,7 +226,7 @@ public class CasesRecord{
 		createPanel.add(lblNameOfArresting);
 		
 		JLabel lblDateOfArrest = new JLabel("Date of arrest:");
-		lblDateOfArrest.setBounds(51, 255, 120, 15);
+		lblDateOfArrest.setBounds(52, 296, 120, 15);
 		createPanel.add(lblDateOfArrest);
 		
 		txtDefName = new JTextField();
@@ -215,7 +246,7 @@ public class CasesRecord{
 		
 		txtDateCrime = new JTextField();
 		txtDateCrime.setColumns(10);
-		txtDateCrime.setBounds(246, 127, 192, 19);
+		txtDateCrime.setBounds(246, 253, 192, 19);
 		createPanel.add(txtDateCrime);
 		
 		txtLocation = new JTextField();
@@ -230,7 +261,7 @@ public class CasesRecord{
 		
 		txtDateArrest = new JTextField();
 		txtDateArrest.setColumns(10);
-		txtDateArrest.setBounds(246, 253, 192, 19);
+		txtDateArrest.setBounds(246, 296, 192, 19);
 		createPanel.add(txtDateArrest);
 		
 		JButton btnProceed = new JButton("Proceed");
@@ -242,6 +273,20 @@ public class CasesRecord{
 		});
 		btnProceed.setBounds(246, 393, 177, 25);
 		createPanel.add(btnProceed);
+		
+		JLabel lblDateOfCrime = new JLabel("Date of crime:");
+		lblDateOfCrime.setBounds(51, 255, 99, 15);
+		createPanel.add(lblDateOfCrime);
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createPanel.setVisible(false);
+				caseManPanel.setVisible(true);
+			}
+		});
+		btnCancel.setBounds(74, 393, 117, 25);
+		createPanel.add(btnCancel);
 		
 		
 	}
@@ -258,14 +303,27 @@ public class CasesRecord{
 			dateCrime = df.parse(txtDateCrime.getText());
 			dateArrest = df.parse(txtDateArrest.getText());
 		
-			current = new Case(generateCIN(), txtDefName.getText(), txtDefAddr.getText(),
-				dateCrime, txtDateCrime.getText(),txtLocation.getText(), txtArrestingOffcr.getText(), dateArrest);
+			int c = generateCIN();
+			current = new Case(c, txtDefName.getText(), txtDefAddr.getText(),
+				dateCrime, txtTypeCrime.getText(),txtLocation.getText(), txtArrestingOffcr.getText(), dateArrest);
+			
+			JISS.db.update("insert into cases (CIN, defName, defAddr, dateCrime, type, location, ao, dateArrest, status) values "
+					+ "(" + c + ", \"" + txtDefName.getText() + "\", \""
+					+ txtDefAddr.getText() + "\", \""
+					+ txtDateCrime.getText() + "\", \""
+					+ txtTypeCrime.getText() + "\", \""
+					+ txtLocation.getText() + "\", \""
+					+ txtArrestingOffcr.getText() + "\", \""
+					+ txtDateArrest.getText() + "\", 0)"
+					);
+			
 		
 			
 		}catch(Exception e){}
 		
-		current.initPanel();
-		casePanel = current.getHearingPanel();
+		current.initPanel(getThis());
+		casePanel = current.getPanel();
+		current.goToHearing();
 		panel.add(casePanel);
 		
 		
@@ -274,11 +332,38 @@ public class CasesRecord{
 		
 	}
 	
-	public void query(){
+	public void reloadTableCases(){
 		
+		caseManPanel.remove(sp);
+		loadTableCases();
+		sp = new JScrollPane(tblCases);
+		sp.setBounds(79, 74, 341, 300);
+		
+		caseManPanel.add(sp);
+	}
+
+	private void loadTableCases(){
+		
+		String[] cols = {"CIN", "Defendant name", "Starting date", "Type", "Status"};
+		int count = JISS.db.queryCount("select count(*) from cases");
+		
+		String[][] rows = new String[count][5];
+		int i=0;
+		
+		ResultSet rs = JISS.db.getrs("select CIN,defName,dateStart,type,status from cases");
+		try{
+			while(rs.next()){
+				for(int j=0; j<5; j++){
+					rows[i][j] = rs.getString(j+1);
+				}
+				i++;
+			}
+		
+		tblCases = new JTable(rows, cols);
+		}catch(Exception e){}
 	}
 	
-	public void vacantSlots(){
+	public void query(){
 		
 	}
 	
@@ -286,5 +371,44 @@ public class CasesRecord{
 		
 		int c = JISS.db.queryCount("select count(*) from cases");
 		return (c+1);
+	}
+	
+	public void backFromCase(){
+		caseManPanel.setVisible(true);
+		casePanel.setVisible(false);
+		panel.remove(casePanel);
+		casePanel = null;
+	}
+	
+	public Case getCase(int cin){
+		
+		ResultSet rs = JISS.db.getrs("select * from cases where CIN = " + cin);
+		try{
+			rs.next();
+			
+			Date dc, da, ds, dh,dec;
+			
+			dc = JISS.getDate(rs.getString(7));
+			da = JISS.getDate(rs.getString(8));
+			dh = JISS.getDate(rs.getString(9));
+			ds = JISS.getDate(rs.getString(10));
+			dec = JISS.getDate(rs.getString(11));
+			boolean s;
+			if(rs.getString(14).equals("1")){
+				s = true;
+			}else s = false;
+			Case case_ = new Case(cin, rs.getString(2), rs.getString(3),dc, rs.getString(4), rs.getString(5), rs.getString(6)
+					, da, rs.getString(12), rs.getString(13), dh, ds, dec, s);
+					
+			return case_;
+		}
+		catch(Exception e){ e.printStackTrace();}
+		
+		//System.out.println("returning null");
+		return null;
+		
+	}
+	private CasesRecord getThis(){
+		return this;
 	}
 }
