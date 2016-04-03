@@ -6,7 +6,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import java.awt.CardLayout;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 import java.awt.event.ActionEvent;
 
 public class User{
@@ -32,6 +35,9 @@ public class User{
 	
 	private JISS parent;
 	public JPanel CRPanel, URPanel, casePanel;
+	
+	private JScrollPane sp;
+	
 	public User(String u, String p, char t){
 		username = u;
 		password = p;
@@ -83,9 +89,11 @@ public class User{
 		btnLogOut.setBounds(371, 12, 117, 25);
 		mainPanel.add(btnLogOut);
 		
+		
 		tblCases = new JTable();
-		tblCases.setBounds(57, 104, 393, 274);
-		mainPanel.add(tblCases);
+		sp = new JScrollPane(tblCases);
+		sp.setBounds(57, 104, 393, 274);
+		mainPanel.add(sp);
 		
 		pwdchangePanel = new JPanel();
 		panel.add(pwdchangePanel, "name_1113697649244");
@@ -141,6 +149,47 @@ public class User{
 		
 		btnCaseManagement.setEnabled(type == 'R');
 		JButton btnGo = new JButton("Go");
+		btnGo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				String keywords = txtKeywords.getText();
+				if(keywords.equals("")){
+					JOptionPane.showMessageDialog(panel, "Keyword cannot be empty!");
+					return;
+				}
+				
+				String[] cols = {"CIN", "Defendant name", "Starting date", "Type", "Status"};
+				int count = JISS.db.queryCount("select count(*) from cases where concat_ws(defName, defAddr, type, location, ao, pj, pp)"
+						+ " like '%" + keywords + "%'");
+				
+				//System.out.println(count);
+				String[][] rows = new String[count][5];
+				int i=0;
+				
+				ResultSet rs = JISS.db.getrs("select CIN,defName,dateStart,type,status from cases where concat_ws(defName, defAddr, type, location, ao, pj, pp)"
+						+ " like '%" + keywords + "%'");
+				try{
+					while(rs.next()){
+						for(int j=0; j<4; j++){
+							rows[i][j] = rs.getString(j+1);
+						}
+						if(rs.getString(5).equals("1"))
+							rows[i][4] = "Closed";
+						else
+							rows[i][4] = "Pending";
+						i++;
+					}
+				
+				tblCases = new JTable(rows, cols);
+				}catch(Exception ex){}
+				
+				mainPanel.remove(sp);
+				sp = new JScrollPane(tblCases);
+				sp.setBounds(57, 104, 393, 274);
+				mainPanel.add(sp);
+			}
+			
+		});
 		btnGo.setBounds(390, 46, 60, 25);
 		mainPanel.add(btnGo);
 		
@@ -151,6 +200,31 @@ public class User{
 		lblNoOfViews = new JLabel("");
 		lblNoOfViews.setBounds(245, 77, 70, 15);
 		mainPanel.add(lblNoOfViews);
+		
+		JButton btnView = new JButton("View");
+		btnView.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int ch = tblCases.getSelectedRow();
+				////System.out.println(ch);
+				String cin = (String) tblCases.getValueAt(ch, 0);
+				int cin_ = Integer.parseInt(cin);
+				////System.out.println("cin_ = " + cin_);
+				Case case_ = JISS.CR.getCase(cin_);
+				case_.initPanel(getThis(), type == 'R');
+				casePanel = case_.getPanel();
+				panel.add(casePanel);
+				casePanel.setVisible(true);
+				mainPanel.setVisible(false);
+				case_.goToView();
+				
+				if(type == 'L'){
+					((Lawyer)getThis()).increaseCount();
+					JISS.db.update("update lawyers set no_of_views = no_of_views+1 where username = \""+ username + "\"");
+				}
+			}
+		});
+		btnView.setBounds(280, 410, 167, 25);
+		mainPanel.add(btnView);
 		lblNoOfViews.setVisible(type == 'L');
 		
 		JLabel lblEnterOldPassword = new JLabel("Enter old password:");
@@ -235,6 +309,14 @@ public class User{
 		panel.remove(CRPanel);
 		CRPanel = null;
 	}
+	
+	public void backFromCase(){
+		mainPanel.setVisible(true);
+		casePanel.setVisible(false);
+		panel.remove(casePanel);
+		casePanel = null;
+	}
+	
 	public JPanel getPanel(){
 		return panel;
 	}

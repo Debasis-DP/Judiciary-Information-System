@@ -23,7 +23,6 @@ public class JISS {
 	private JTextField txtUsername;
 	private JPasswordField txtPassword;
 	private JPanel createRegistrarPanel, loginPanel;
-	private Lawyer l1, l2;
 	private JTextField txtRegUsername;
 	private JPasswordField pwdReg_1;
 	private JPasswordField pwdReg_2;
@@ -78,12 +77,11 @@ public class JISS {
 			db.update("create table users (username varchar(20), password varchar(20), type char(1))");
 			db.update("create table cases (CIN int(8), defName varchar(20), defAddr varchar(40), type varchar(20), location varchar(20)"
 			+ ", ao varchar(20), dateCrime char (10), dateArrest char(10), dateHearing char(10), dateStart char(10), dateComp char(10)"
-			+ ", pj varchar(20), pp varchar(20), status boolean) ");
+			+ ", pj varchar(20), pp varchar(20), status boolean, jsum varchar(40)) ");
 			db.update("create table hearings (CIN int(8), scheduled_date char(10), slot char(1), summary varchar(20))");
 			db.update("create table adjs (CIN int(8), scheduled_date char(10), slot char(1), reason varchar(20)) ");
 			
 			db.update("create table lawyers (username varchar(20), no_of_views int(8))");
-			//db.update("create table judges(username varchar(20), j_id int(8))");
 		}
 		else
 			db.query("use jiss");
@@ -108,7 +106,7 @@ public class JISS {
 			
 		
 			if(rs.next()){
-				System.out.println("not null:" + rs.getString("username"));
+			//	System.out.println("not null:" + rs.getString("username"));
 				createRegistrarPanel.setVisible(false);
 				loginPanel.setVisible(true);
 			}else{
@@ -123,9 +121,9 @@ public class JISS {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 500, 500);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame = new JFrame("Judiciary Information System");
+		frame.setBounds(100, 100, 500, 600);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
 		
 		createRegistrarPanel = new JPanel();
@@ -181,6 +179,15 @@ public class JISS {
 		JLabel lblRegistrarAccountCreation = new JLabel("Registrar Account Creation:");
 		lblRegistrarAccountCreation.setBounds(73, 12, 219, 15);
 		createRegistrarPanel.add(lblRegistrarAccountCreation);
+		
+		JButton btnExit = new JButton("Exit");
+		btnExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		btnExit.setBounds(291, 226, 117, 25);
+		createRegistrarPanel.add(btnExit);
 		
 		loginPanel = new JPanel();
 		frame.getContentPane().add(loginPanel, "name_48894252615869");
@@ -272,6 +279,15 @@ public class JISS {
 		});
 		btnLogin.setBounds(33, 210, 117, 25);
 		loginPanel.add(btnLogin);
+		
+		JButton button = new JButton("Exit");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		button.setBounds(219, 210, 117, 25);
+		loginPanel.add(button);
 		
 		
 	}

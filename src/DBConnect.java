@@ -39,7 +39,7 @@ public class DBConnect {
 	public void query(String query){
 		try{
 			rs = st.executeQuery(query);
-			System.out.println(query+ ": success");
+			//System.out.println(query+ ": success");
 		}catch(Exception ex){
 			System.out.println("Error : "+ ex);
 			
@@ -49,7 +49,7 @@ public class DBConnect {
 	public void update(String query){
 		try{
 			st.executeUpdate(query);
-			System.out.println(query+ ": success");
+		//	System.out.println(query+ ": success");
 		}catch(Exception ex){
 			System.out.println("Error : "+ ex);
 			
@@ -91,7 +91,7 @@ public class DBConnect {
 	public int queryCount(String query){
 		try{
 			rs = st.executeQuery(query);
-			System.out.println(query+ ": success");
+			//System.out.println(query+ ": success");
 			rs.next();
 			return rs.getInt(1);
 			

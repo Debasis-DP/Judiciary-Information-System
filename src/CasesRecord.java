@@ -28,16 +28,17 @@ public class CasesRecord{
 	private JTextField txtDateArrest;
 	private JTextField txtFrom;
 	private JTextField txtTo;
-	private JTextField txtCIN;
 	private JTextField txtDateHearing;
-	private JTable tblQueryResult;
+	private JTextField txtCIN;
+	private JTable tblQueryCases;
 	
 	private Case current; //the current Case object
 	private JPanel casePanel;
 	
-	private JScrollPane sp;
+	private JScrollPane sp, sp2;
 	
 	private User accessor;
+	private boolean querying= false;
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -77,10 +78,10 @@ public class CasesRecord{
 		btnEditCase.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int ch = tblCases.getSelectedRow();
-				System.out.println(ch);
+				//System.out.println(ch);
 				String cin = (String) tblCases.getValueAt(ch, 0);
 				int cin_ = Integer.parseInt(cin);
-				System.out.println("cin_ = " + cin_);
+				//System.out.println("cin_ = " + cin_);
 				Case case_ = getCase(cin_);
 				case_.initPanel(getThis());
 				casePanel = case_.getPanel();
@@ -103,6 +104,12 @@ public class CasesRecord{
 		caseManPanel.add(btnBack_1);
 		
 		JButton btnQueryCase = new JButton("Query");
+		btnQueryCase.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				queryPanel.setVisible(true);
+				caseManPanel.setVisible(false);
+			}
+		});
 		btnQueryCase.setBounds(205, 447, 117, 25);
 		caseManPanel.add(btnQueryCase);
 		
@@ -118,9 +125,39 @@ public class CasesRecord{
 		tabbedPane.addTab("Pending", null, pendingPanel, null);
 		pendingPanel.setLayout(null);
 		
-		JLabel lblShowingAllPending = new JLabel("Showing all pending cases:");
+		JLabel lblShowingAllPending = new JLabel("All pending cases:");
 		lblShowingAllPending.setBounds(25, 31, 249, 15);
 		pendingPanel.add(lblShowingAllPending);
+		
+		JButton btnGo_3 = new JButton("Go");
+		btnGo_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				String[] cols = {"CIN", "Defendant name", "Starting date", "Type"};
+				int count = JISS.db.queryCount("select count(*) from cases where status=0");
+				
+				String[][] rows = new String[count][4];
+				int i=0;
+				
+				ResultSet rs = JISS.db.getrs("select CIN,defName,dateStart,type from cases where status=0");
+				try{
+					while(rs.next()){
+						for(int j=0; j<4; j++){
+							rows[i][j] = rs.getString(j+1);
+						}
+						
+						i++;
+					}
+				
+				tblQueryCases = new JTable(rows, cols);
+				}catch(Exception ex){}
+				
+				reloadTableQuery();
+				
+			}
+		});
+		btnGo_3.setBounds(171, 26, 117, 25);
+		pendingPanel.add(btnGo_3);
 		
 		JPanel resolvedPanel = new JPanel();
 		tabbedPane.addTab("Resolved", null, resolvedPanel, null);
@@ -145,6 +182,36 @@ public class CasesRecord{
 		txtTo.setColumns(10);
 		
 		JButton btnGo = new JButton("Go");
+		btnGo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				
+				String[] cols = {"Starting date", "CIN", "Date of judgement", "Presiding judge", "Judgement summary"};
+				int count = JISS.db.queryCount("select count(*) from cases where str_to_date(dateStart, '%d/%m/%Y')"+
+				" > str_to_date(\"" + txtFrom.getText() + "\", '%d/%m/%Y') and str_to_date(dateHearing, '%d/%m/%Y')"+
+				" < str_to_date(\"" + txtTo.getText() + "\", '%d/%m/%Y') and status=1");
+				//System.out.println(count);
+				String[][] rows = new String[count][5];
+				int i=0;
+				
+				try{
+					ResultSet rs = JISS.db.getrs("select dateStart, CIN, dateHearing, pj, jsum from cases where str_to_date(dateStart, '%d/%m/%Y')"+
+				" > str_to_date(\"" + txtFrom.getText() + "\", '%d/%m/%Y') and str_to_date(dateHearing, '%d/%m/%Y')"+
+				" < str_to_date(\"" + txtTo.getText() + "\", '%d/%m/%Y') and status=1 order by str_to_date(dateStart, '%d/%m/%Y')");
+						while(rs.next()){
+							for(int j=0; j<5; j++){
+								rows[i][j] = rs.getString(j+1);
+							}
+						}
+					
+					tblQueryCases = new JTable(rows, cols);
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
+				
+				reloadTableQuery();
+			}
+		});
 		btnGo.setBounds(264, 12, 117, 25);
 		resolvedPanel.add(btnGo);
 		
@@ -156,12 +223,45 @@ public class CasesRecord{
 		lblDateOfHearing.setBounds(30, 29, 116, 15);
 		dateofHearingPanel.add(lblDateOfHearing);
 		
-		txtCIN = new JTextField();
-		txtCIN.setBounds(150, 27, 114, 19);
-		dateofHearingPanel.add(txtCIN);
-		txtCIN.setColumns(10);
+		txtDateHearing = new JTextField();
+		txtDateHearing.setBounds(150, 27, 114, 19);
+		dateofHearingPanel.add(txtDateHearing);
+		txtDateHearing.setColumns(10);
 		
 		JButton btnGo_1 = new JButton("Go");
+		btnGo_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				String[] cols = {"CIN", "Defendant name", "Type", "Slot"};
+				int count = JISS.db.queryCount("select count(*) from cases where dateHearing=\"" + txtDateHearing.getText() + "\"");
+				//System.out.println(count);
+				String[][] rows = new String[count][4];
+				int i=0;
+				
+				ResultSet rs = JISS.db.getrs("select CIN,defName,dateStart from cases where dateHearing=\"" + txtDateHearing.getText() + "\"");
+				try{
+					while(rs.next()){
+						for(int j=0; j<3; j++){
+							rows[i][j] = rs.getString(j+1);
+						}
+				
+					}
+					for(i=0; i<count; i++){
+						rs = JISS.db.getrs("select slot from hearings where CIN=" + rows[i][0] 
+								+ " and scheduled_date = \"" + txtDateHearing.getText() + "\"");
+						rs.next();
+						rows[i][3] = rs.getString(1);
+					}
+				
+				tblQueryCases = new JTable(rows, cols);
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
+				
+				reloadTableQuery();
+			
+			}
+		});
 		btnGo_1.setBounds(276, 24, 93, 25);
 		dateofHearingPanel.add(btnGo_1);
 		
@@ -173,24 +273,52 @@ public class CasesRecord{
 		lblCin.setBounds(32, 31, 70, 15);
 		CINPanel.add(lblCin);
 		
-		txtDateHearing = new JTextField();
-		txtDateHearing.setBounds(88, 29, 131, 19);
-		CINPanel.add(txtDateHearing);
-		txtDateHearing.setColumns(10);
+		txtCIN = new JTextField();
+		txtCIN.setBounds(88, 29, 131, 19);
+		CINPanel.add(txtCIN);
+		txtCIN.setColumns(10);
 		
 		JButton btnGo_2 = new JButton("Go");
+		btnGo_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String[] cols = {"CIN", "Defendant name", "Starting date", "Type", "Status"};
+				int count = JISS.db.queryCount("select count(*) from cases where CIN=" + txtCIN.getText());
+				
+				String[][] rows = new String[count][5];
+				int i=0;
+				
+				ResultSet rs = JISS.db.getrs("select CIN,defName,dateStart,type,status from cases where CIN=" + txtCIN.getText());
+				try{
+					while(rs.next()){
+						for(int j=0; j<4; j++){
+							rows[i][j] = rs.getString(j+1);
+						}
+						if(rs.getString(5).equals("1"))
+							rows[i][4] = "Closed";
+						else
+							rows[i][4] = "Pending";
+					}
+				
+				tblQueryCases = new JTable(rows, cols);
+				}catch(Exception ex){}
+				
+				reloadTableQuery();
+			}
+		});
 		btnGo_2.setBounds(234, 26, 99, 25);
 		CINPanel.add(btnGo_2);
 		
-		tblQueryResult = new JTable();
-		tblQueryResult.setBounds(37, 174, 395, 251);
-		queryPanel.add(tblQueryResult);
+		tblQueryCases = new JTable();
+		sp2 = new JScrollPane(tblQueryCases);
+		sp2.setBounds(37, 174, 395, 251);
+		queryPanel.add(sp2);
 		
 		JButton btnBack = new JButton("Back");
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				queryPanel.setVisible(false);
 				caseManPanel.setVisible(true);
+				querying = false;
 				
 			}
 		});
@@ -198,6 +326,24 @@ public class CasesRecord{
 		queryPanel.add(btnBack);
 		
 		JButton btnView = new JButton("View");
+		btnView.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int ch = tblQueryCases.getSelectedRow();
+				////System.out.println(ch);
+				String cin = (String) tblQueryCases.getValueAt(ch, 0);
+				int cin_ = Integer.parseInt(cin);
+				////System.out.println("cin_ = " + cin_);
+				Case case_ = getCase(cin_);
+				case_.initPanel(getThis());
+				casePanel = case_.getPanel();
+				panel.add(casePanel);
+				casePanel.setVisible(true);
+				queryPanel.setVisible(false);
+				case_.goToView();
+				
+				querying = true;
+			}
+		});
 		btnView.setBounds(177, 439, 117, 25);
 		queryPanel.add(btnView);
 		
@@ -294,7 +440,7 @@ public class CasesRecord{
 	public JPanel getPanel(){
 		return panel;
 	}
-	public void createCase(){
+	private void createCase(){
 		
 		Date dateCrime, dateArrest;
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -332,12 +478,13 @@ public class CasesRecord{
 		
 	}
 	
-	public void reloadTableCases(){
+	private void reloadTableCases(){
 		
 		caseManPanel.remove(sp);
 		loadTableCases();
 		sp = new JScrollPane(tblCases);
-		sp.setBounds(79, 74, 341, 300);
+		sp.setBounds(76, 42, 335, 336);
+		//sp.setBounds(79, 74, 341, 300);
 		
 		caseManPanel.add(sp);
 	}
@@ -353,9 +500,13 @@ public class CasesRecord{
 		ResultSet rs = JISS.db.getrs("select CIN,defName,dateStart,type,status from cases");
 		try{
 			while(rs.next()){
-				for(int j=0; j<5; j++){
+				for(int j=0; j<4; j++){
 					rows[i][j] = rs.getString(j+1);
 				}
+				if(rs.getString(5).equals("1"))
+					rows[i][4] = "Closed";
+				else
+					rows[i][4] = "Pending";
 				i++;
 			}
 		
@@ -363,21 +514,32 @@ public class CasesRecord{
 		}catch(Exception e){}
 	}
 	
-	public void query(){
-		
+	private void reloadTableQuery(){
+		queryPanel.remove(sp2);
+		sp2 = new JScrollPane(tblQueryCases);
+		sp2.setBounds(37, 174, 395, 251);
+		queryPanel.add(sp2);
 	}
 	
-	public int generateCIN(){
+	private int generateCIN(){
 		
 		int c = JISS.db.queryCount("select count(*) from cases");
 		return (c+1);
 	}
 	
 	public void backFromCase(){
-		caseManPanel.setVisible(true);
+		
+		if(querying)
+			queryPanel.setVisible(true);
+			
+		else
+			caseManPanel.setVisible(true);
 		casePanel.setVisible(false);
 		panel.remove(casePanel);
 		casePanel = null;
+		reloadTableCases();
+		
+		
 	}
 	
 	public Case getCase(int cin){
@@ -398,13 +560,12 @@ public class CasesRecord{
 				s = true;
 			}else s = false;
 			Case case_ = new Case(cin, rs.getString(2), rs.getString(3),dc, rs.getString(4), rs.getString(5), rs.getString(6)
-					, da, rs.getString(12), rs.getString(13), dh, ds, dec, s);
+					, da, rs.getString(12), rs.getString(13), dh, ds, dec, s, rs.getString(15));
 					
 			return case_;
 		}
 		catch(Exception e){ e.printStackTrace();}
 		
-		//System.out.println("returning null");
 		return null;
 		
 	}

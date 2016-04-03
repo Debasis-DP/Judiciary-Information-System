@@ -190,6 +190,9 @@ public class UsersRecord{
 		else t = 'J';
 		JISS.db.update("insert into users values (\"" + txtUsername.getText() + "\", \"" + txtPassword.getText() + "\", \"" + t + "\")");
 		
+		if(t=='L')
+			JISS.db.update("insert into lawyers values (\""+ txtUsername.getText()+ "\", 0)");
+		
 		cmbTypeUser.setSelectedIndex(0);
 		txtUsername.setText("");
 		txtPassword.setText("");
@@ -201,7 +204,7 @@ public class UsersRecord{
 	
 	public void deleteUser(){
 		int ch = tblUsers.getSelectedRow();
-		System.out.println(ch);
+		//System.out.println(ch);
 		String uname = (String) tblUsers.getValueAt(ch, 0);
 		JISS.db.update("delete from users where username = \"" + uname + "\"");
 		
