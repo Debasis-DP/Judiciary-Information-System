@@ -2,6 +2,7 @@ import java.awt.CardLayout;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -57,7 +58,7 @@ public class CasesRecord{
 		loadTableCases();
 		//tblCases = new JTable();
 		sp = new JScrollPane(tblCases);
-		sp.setBounds(76, 42, 335, 336);
+		sp.setBounds(12, 42, 476, 336);
 		caseManPanel.add(sp);
 		
 		JLabel lblListOfCases = new JLabel("List of cases:");
@@ -78,10 +79,12 @@ public class CasesRecord{
 		btnEditCase.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int ch = tblCases.getSelectedRow();
-				//System.out.println(ch);
+				if(ch==-1){
+					JOptionPane.showMessageDialog(panel, "Please select a case!");
+					return;
+				}
 				String cin = (String) tblCases.getValueAt(ch, 0);
 				int cin_ = Integer.parseInt(cin);
-				//System.out.println("cin_ = " + cin_);
 				Case case_ = getCase(cin_);
 				case_.initPanel(getThis());
 				casePanel = case_.getPanel();
@@ -118,7 +121,7 @@ public class CasesRecord{
 		queryPanel.setLayout(null);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(34, 40, 398, 110);
+		tabbedPane.setBounds(12, 40, 476, 110);
 		queryPanel.add(tabbedPane);
 		
 		JPanel pendingPanel = new JPanel();
@@ -185,6 +188,10 @@ public class CasesRecord{
 		btnGo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			
+				if(JISS.getDate(txtFrom.getText()) == null || JISS.getDate(txtTo.getText()) == null){
+					JOptionPane.showMessageDialog(panel, "Please enter valid date (dd/mm/yyyy)!");
+					return;
+				}
 				
 				String[] cols = {"Starting date", "CIN", "Date of judgement", "Presiding judge", "Judgement summary"};
 				int count = JISS.db.queryCount("select count(*) from cases where str_to_date(dateStart, '%d/%m/%Y')"+
@@ -232,6 +239,10 @@ public class CasesRecord{
 		btnGo_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				if(JISS.getDate(txtDateHearing.getText()) == null){
+					JOptionPane.showMessageDialog(panel, "Please enter valid date (dd/mm/yyyy)!");
+					return;
+				}
 				String[] cols = {"CIN", "Defendant name", "Type", "Slot"};
 				int count = JISS.db.queryCount("select count(*) from cases where dateHearing=\"" + txtDateHearing.getText() + "\"");
 				//System.out.println(count);
@@ -281,6 +292,10 @@ public class CasesRecord{
 		JButton btnGo_2 = new JButton("Go");
 		btnGo_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(txtCIN.getText().isEmpty()){
+					JOptionPane.showMessageDialog(panel, "Please enter a CIN!");
+					return;
+				}
 				String[] cols = {"CIN", "Defendant name", "Starting date", "Type", "Status"};
 				int count = JISS.db.queryCount("select count(*) from cases where CIN=" + txtCIN.getText());
 				
@@ -310,7 +325,7 @@ public class CasesRecord{
 		
 		tblQueryCases = new JTable();
 		sp2 = new JScrollPane(tblQueryCases);
-		sp2.setBounds(37, 174, 395, 251);
+		sp2.setBounds(12, 174, 476, 251);
 		queryPanel.add(sp2);
 		
 		JButton btnBack = new JButton("Back");
@@ -329,10 +344,12 @@ public class CasesRecord{
 		btnView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int ch = tblQueryCases.getSelectedRow();
-				////System.out.println(ch);
+				if(ch==-1){
+					JOptionPane.showMessageDialog(panel, "Please select a case!");
+					return;
+				}
 				String cin = (String) tblQueryCases.getValueAt(ch, 0);
 				int cin_ = Integer.parseInt(cin);
-				////System.out.println("cin_ = " + cin_);
 				Case case_ = getCase(cin_);
 				case_.initPanel(getThis());
 				casePanel = case_.getPanel();
@@ -443,12 +460,18 @@ public class CasesRecord{
 	private void createCase(){
 		
 		Date dateCrime, dateArrest;
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-		df.setLenient(false);
 		try{
-			dateCrime = df.parse(txtDateCrime.getText());
-			dateArrest = df.parse(txtDateArrest.getText());
+			dateCrime = JISS.getDate(txtDateCrime.getText());
+			dateArrest = JISS.getDate(txtDateArrest.getText());
 		
+			if(txtDefName.getText().isEmpty() || txtTypeCrime.getText().isEmpty()){
+				JOptionPane.showMessageDialog(panel, "Required fields: defendant name, type of crime");
+				return;
+			}
+			if(dateCrime == null || dateArrest == null){
+				JOptionPane.showMessageDialog(panel, "Please enter valid date (dd/mm/yyyy)!");
+				return;
+			}
 			int c = generateCIN();
 			current = new Case(c, txtDefName.getText(), txtDefAddr.getText(),
 				dateCrime, txtTypeCrime.getText(),txtLocation.getText(), txtArrestingOffcr.getText(), dateArrest);
@@ -464,6 +487,14 @@ public class CasesRecord{
 					);
 			
 		
+			txtDefName.setText("");
+			txtDefAddr.setText("");
+			txtTypeCrime.setText("");
+			txtDateCrime.setText("");
+			txtLocation.setText("");
+			txtArrestingOffcr.setText("");
+			txtDateArrest.setText("");
+			
 			
 		}catch(Exception e){}
 		
@@ -483,8 +514,7 @@ public class CasesRecord{
 		caseManPanel.remove(sp);
 		loadTableCases();
 		sp = new JScrollPane(tblCases);
-		sp.setBounds(76, 42, 335, 336);
-		//sp.setBounds(79, 74, 341, 300);
+		sp.setBounds(12, 42, 476, 336);
 		
 		caseManPanel.add(sp);
 	}
@@ -517,7 +547,7 @@ public class CasesRecord{
 	private void reloadTableQuery(){
 		queryPanel.remove(sp2);
 		sp2 = new JScrollPane(tblQueryCases);
-		sp2.setBounds(37, 174, 395, 251);
+		sp2.setBounds(12, 174, 476, 251);
 		queryPanel.add(sp2);
 	}
 	

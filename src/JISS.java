@@ -41,6 +41,9 @@ public class JISS {
 	public static Date getDate(String s){
 	
 		DateFormat df=  new SimpleDateFormat("dd/MM/yyyy");
+		df.setLenient(false);
+		if(s.length() != 10 || s.charAt(2) != '/' || s.charAt(5) != '/')
+			return null;
 		try{
 			return df.parse(s);
 		}catch(Exception e){
@@ -87,11 +90,6 @@ public class JISS {
 			db.query("use jiss");
 		
 		
-		
-		
-		
-		//db.update("drop database jiss");
-		
 	}
 
 	/**
@@ -106,7 +104,6 @@ public class JISS {
 			
 		
 			if(rs.next()){
-			//	System.out.println("not null:" + rs.getString("username"));
 				createRegistrarPanel.setVisible(false);
 				loginPanel.setVisible(true);
 			}else{
@@ -136,9 +133,14 @@ public class JISS {
 			public void actionPerformed(ActionEvent e) {
 				
 				if(! String.valueOf(pwdReg_1.getPassword()).equals(String.valueOf(pwdReg_2.getPassword()))){
-					JOptionPane.showMessageDialog(frame, String.valueOf(pwdReg_1.getPassword()) + " : " + String.valueOf(pwdReg_2.getPassword()));
+					JOptionPane.showMessageDialog(frame, "Passwords do not match!");
 					pwdReg_1.setText("");
 					pwdReg_2.setText("");
+					return;
+				}
+				
+				if(String.valueOf(pwdReg_1.getPassword()).isEmpty() || txtRegUsername.getText().isEmpty()){
+					JOptionPane.showMessageDialog(frame, "Username/password cannot be empty!");
 					return;
 				}
 				

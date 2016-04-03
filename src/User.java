@@ -17,10 +17,7 @@ public class User{
 	private String username, password;
 	private char type;
 	
-	
 	protected JPanel panel;
-
-
 	protected JPanel mainPanel;
 
 
@@ -49,8 +46,9 @@ public class User{
 			return 1;
 		else if(! String.valueOf(pwdNew_1.getPassword()).equals(String.valueOf(pwdNew_2.getPassword()))){
 			return 2;
-		}
-		else{
+		}else if(String.valueOf(pwdNew_1.getPassword()).isEmpty()){
+			return 3;
+		}else{
 			password = String.valueOf(pwdNew_1.getPassword());
 			return 0;
 		}
@@ -92,7 +90,7 @@ public class User{
 		
 		tblCases = new JTable();
 		sp = new JScrollPane(tblCases);
-		sp.setBounds(57, 104, 393, 274);
+		sp.setBounds(12, 104, 476, 274);
 		mainPanel.add(sp);
 		
 		pwdchangePanel = new JPanel();
@@ -185,7 +183,7 @@ public class User{
 				
 				mainPanel.remove(sp);
 				sp = new JScrollPane(tblCases);
-				sp.setBounds(57, 104, 393, 274);
+				sp.setBounds(12, 104, 476, 274);
 				mainPanel.add(sp);
 			}
 			
@@ -205,10 +203,12 @@ public class User{
 		btnView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int ch = tblCases.getSelectedRow();
-				////System.out.println(ch);
+				if(ch==-1){
+					JOptionPane.showMessageDialog(panel, "Please select a case!");
+					return;
+				}
 				String cin = (String) tblCases.getValueAt(ch, 0);
 				int cin_ = Integer.parseInt(cin);
-				////System.out.println("cin_ = " + cin_);
 				Case case_ = JISS.CR.getCase(cin_);
 				case_.initPanel(getThis(), type == 'R');
 				casePanel = case_.getPanel();
@@ -265,6 +265,8 @@ public class User{
 				}
 				else if(changePassword() == 2){
 					JOptionPane.showMessageDialog(panel, "Re-typed password does not match!");
+				}else if(changePassword() == 3){
+					JOptionPane.showMessageDialog(panel, "Password cannot be empty!");
 				}
 				
 				pwdOld.setText("");

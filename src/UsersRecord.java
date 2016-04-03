@@ -167,7 +167,7 @@ public class UsersRecord{
 		loadTableUsers();
 		sp = new JScrollPane(tblUsers);
 		sp.setBounds(79, 74, 341, 300);
-		
+
 		userManPanel.add(sp);
 	}
 	public JPanel getPanel(){
@@ -204,6 +204,10 @@ public class UsersRecord{
 	
 	public void deleteUser(){
 		int ch = tblUsers.getSelectedRow();
+		if(ch==-1){
+			JOptionPane.showMessageDialog(panel, "Please select a user!");
+			return;
+		}
 		//System.out.println(ch);
 		String uname = (String) tblUsers.getValueAt(ch, 0);
 		JISS.db.update("delete from users where username = \"" + uname + "\"");

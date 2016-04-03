@@ -4,6 +4,7 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -52,7 +53,7 @@ public class Case{
 	private JTextField txtArrestingOffcr;
 	private JTextField txtPresJudge;
 	private JTextField txtPublicPros;
-	private JTextField txtDateStarting;
+	private JLabel lblDateStarting;
 	private JTextField txtDateComp;
 	
 	private JTextArea txtSummaryProc, txtJudgeSum;
@@ -150,8 +151,10 @@ public class Case{
 		JButton btnGetVacantSlots = new JButton("Get vacant slots");
 		btnGetVacantSlots.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-//				String dstr = df.format(date)
+				if(JISS.getDate(txtDateHearing.getText()) == null){
+					JOptionPane.showMessageDialog(panel, "Please enter valid date (dd/mm/yyyy)");
+					return;
+				}
 				int[] slots = new int[3];
 				for(int i=0; i<3; i++)
 					slots[i] = 1;
@@ -191,7 +194,10 @@ public class Case{
 				JISS.db.update("insert into hearings values (" + CIN + ", \"" + txtDateHearing.getText() + "\", \"" + sl + "\", \"-\")");
 				
 				JISS.db.update("update cases set dateHearing=\"" + txtDateHearing.getText() + "\" where CIN = " + CIN);
+				JISS.db.update("update cases set dateStart=dateHearing where dateStart is null and CIN=" + CIN);
+				
 				dateHearing = JISS.getDate(txtDateHearing.getText());
+				dateStart = dateHearing;
 				txtDateHearing.setText("");
 				cmbSlots.removeAllItems();
 				hearingAssignPanel.setVisible(false);
@@ -233,7 +239,6 @@ public class Case{
 					rs.next();
 					sl = rs.getString(1);
 				}catch(Exception ex){
-					//System.out.println("error");
 				}
 				JISS.db.update("delete from hearings where CIN = " + CIN + " and scheduled_date = \"" + JISS.DtoS(dateHearing) + "\"");
 				JISS.db.update("insert into adjs (CIN, scheduled_date, slot, reason) values (" + CIN + ", \"" + JISS.DtoS(dateHearing) + "\", \"" + sl + "\", \"" +
@@ -359,6 +364,11 @@ public class Case{
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				if(txtDefName.getText().isEmpty() || txtTypeCrime.getText().isEmpty()){
+					JOptionPane.showMessageDialog(panel, "Required fields: defendant name, type of crime");
+					return;
+				}
+				
 				if(!status && mode)
 					JISS.db.update("update cases set "+
 					"defName=\"" + txtDefName.getText() + "\", " +
@@ -367,7 +377,6 @@ public class Case{
 					"dateCrime=\"" + txtDateCrime.getText() + "\", "+
 					"location=\"" + txtLocation.getText() + "\", "+
 					"dateArrest=\"" + txtDateArrest.getText() + "\", "+
-					"dateStart=\"" + txtDateStarting.getText() + "\", "+
 					"dateComp=\"" + txtDateComp.getText() + "\", "+
 					"ao=\"" + txtArrestingOffcr.getText() + "\", "+
 					"pj=\"" + txtPresJudge.getText() + "\", " +
@@ -490,10 +499,9 @@ public class Case{
 		txtPublicPros.setBounds(255, 253, 174, 19);
 		viewPanel.add(txtPublicPros);
 		
-		txtDateStarting = new JTextField();
-		txtDateStarting.setColumns(10);
-		txtDateStarting.setBounds(255, 280, 114, 19);
-		viewPanel.add(txtDateStarting);
+		lblDateStarting = new JLabel("");
+		lblDateStarting.setBounds(255, 280, 114, 19);
+		viewPanel.add(lblDateStarting);
 		
 		txtDateComp = new JTextField();
 		txtDateComp.setColumns(10);
@@ -552,23 +560,23 @@ public class Case{
 		historyPanel.setLayout(null);
 		
 		JLabel lblHearingHistory = new JLabel("Hearing history:");
-		lblHearingHistory.setBounds(55, 62, 126, 15);
+		lblHearingHistory.setBounds(55, 37, 126, 15);
 		historyPanel.add(lblHearingHistory);
 		
 		JLabel lblAdjournmentHistory = new JLabel("Adjournment history:");
-		lblAdjournmentHistory.setBounds(55, 274, 150, 15);
+		lblAdjournmentHistory.setBounds(55, 246, 150, 15);
 		historyPanel.add(lblAdjournmentHistory);
 		
 		
 		//tblHears = new JTable();
 		loadHistoryPanel();
 		sp1 = new JScrollPane(tblHears);
-		sp1.setBounds(49, 89, 365, 154);
+		sp1.setBounds(29, 64, 438, 179);
 		historyPanel.add(sp1);
 		
 		sp2 = new JScrollPane(tblAdjs);
 		
-		sp2.setBounds(49, 295, 365, 154);
+		sp2.setBounds(29, 273, 438, 178);
 		historyPanel.add(sp2);
 		
 		JButton btnBack = new JButton("Back");
@@ -620,7 +628,7 @@ public class Case{
 			txtArrestingOffcr.setText(arrestingOfficer);
 			txtDateCrime.setText(JISS.DtoS(dateCrime));
 			txtDateArrest.setText(JISS.DtoS(dateArrest));
-			txtDateStarting.setText(JISS.DtoS(dateStart));
+			lblDateStarting.setText(JISS.DtoS(dateStart));
 			
 			txtDateComp.setEditable(!status && mode);
 			txtDefName.setEditable(!status && mode);
@@ -628,7 +636,6 @@ public class Case{
 			txtTypeCrime.setEditable(!status && mode);
 			txtLocation.setEditable(!status && mode);
 			txtDateCrime.setEditable(!status && mode);
-			txtDateStarting.setEditable(!status && mode);
 			txtDateArrest.setEditable(!status && mode);
 			txtArrestingOffcr.setEditable(!status && mode);
 			txtPresJudge.setEditable(!status && mode);
@@ -662,12 +669,12 @@ public class Case{
 		historyPanel.remove(sp2);
 		loadHistoryPanel();
 		sp1 = new JScrollPane(tblHears);
-		sp1.setBounds(49, 89, 365, 154);
+		sp1.setBounds(29, 64, 438, 179);
 		historyPanel.add(sp1);
 		
 		sp2 = new JScrollPane(tblAdjs);
-		
-		sp2.setBounds(49, 295, 365, 154);
+
+		sp2.setBounds(29, 273, 438, 178);
 		historyPanel.add(sp2);
 	}
 
