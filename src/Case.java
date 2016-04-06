@@ -36,11 +36,9 @@ public class Case{
 					publicPros,
 					judgeSum;
 	private int CIN;
-	private boolean status; //true for SCHEDULED, false for CLOSED
+	private boolean status; //FALSE for PENDING, TRUE for CLOSED
 	
-	
-	
-	//private database  adjs, hearings;
+
 	
 	private JPanel panel;
 	private JTextField txtDateHearing;
@@ -191,13 +189,18 @@ public class Case{
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String sl = (String)cmbSlots.getSelectedItem();
+				if(sl == null){
+					JOptionPane.showMessageDialog(panel, "No slot selected!");
+					return;
+				}
 				JISS.db.update("insert into hearings values (" + CIN + ", \"" + txtDateHearing.getText() + "\", \"" + sl + "\", \"-\")");
 				
 				JISS.db.update("update cases set dateHearing=\"" + txtDateHearing.getText() + "\" where CIN = " + CIN);
 				JISS.db.update("update cases set dateStart=dateHearing where dateStart is null and CIN=" + CIN);
 				
 				dateHearing = JISS.getDate(txtDateHearing.getText());
-				dateStart = dateHearing;
+				if(dateStart == null)
+					dateStart = dateHearing;
 				txtDateHearing.setText("");
 				cmbSlots.removeAllItems();
 				hearingAssignPanel.setVisible(false);
@@ -360,7 +363,7 @@ public class Case{
 		panel.add(viewPanel, "name_1078370647751");
 		viewPanel.setLayout(null);
 		
-		JButton btnSave = new JButton("Save");
+		JButton btnSave = new JButton("Save & Back");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -388,27 +391,27 @@ public class Case{
 			}
 			
 		});
-		btnSave.setBounds(66, 448, 68, 25);
+		btnSave.setBounds(66, 417, 198, 25);
 		viewPanel.add(btnSave);
 		
-		btnUpdate = new JButton("Update");
+		btnUpdate = new JButton("Update hearing details");
 		btnUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updatePanel.setVisible(true);
 				viewPanel.setVisible(false);
 			}
 		});
-		btnUpdate.setBounds(269, 448, 86, 25);
+		btnUpdate.setBounds(66, 448, 198, 25);
 		viewPanel.add(btnUpdate);
 		
-		btnAdjourn = new JButton("Adjourn");
+		btnAdjourn = new JButton("Adjourn hearing");
 		btnAdjourn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				adjournPanel.setVisible(true);
 				viewPanel.setVisible(false);
 			}
 		});
-		btnAdjourn.setBounds(367, 448, 89, 25);
+		btnAdjourn.setBounds(269, 448, 193, 25);
 		viewPanel.add(btnAdjourn);
 		
 		JLabel lblDefendantName = new JLabel("Defendant name:");

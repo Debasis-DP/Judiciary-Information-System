@@ -519,7 +519,7 @@ public class CasesRecord{
 		caseManPanel.add(sp);
 	}
 
-	private void loadTableCases(){
+	private void loadTableCases(){ //loads cases table from the database
 		
 		String[] cols = {"CIN", "Defendant name", "Starting date", "Type", "Status"};
 		int count = JISS.db.queryCount("select count(*) from cases");
@@ -572,7 +572,7 @@ public class CasesRecord{
 		
 	}
 	
-	public Case getCase(int cin){
+	public Case getCase(int cin){ //returns the Case details in a Case object
 		
 		ResultSet rs = JISS.db.getrs("select * from cases where CIN = " + cin);
 		try{

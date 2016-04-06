@@ -33,7 +33,9 @@ public class JISS {
 	public static UsersRecord UR = new UsersRecord();
 	
 	
-	public static DBConnect db = new DBConnect();
+	public static DBConnect db;
+	
+	
 	/**
 	 * Launch the application.
 	 */
@@ -60,6 +62,14 @@ public class JISS {
 		}
 	}
 	public static void main(String[] args) {
+		
+		try{
+			db = new DBConnect();
+		}catch(Exception e){
+			JOptionPane.showMessageDialog(null, "Database connection error. Please check the following:\nMySQL must be installed."
+					+ "\nUser 'sqluser' with no password must be created.\nExiting...");
+			return;
+		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {

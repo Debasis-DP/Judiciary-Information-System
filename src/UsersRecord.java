@@ -139,18 +139,18 @@ public class UsersRecord{
 		//loadTableUsers();
 	}
 	
-	public void loadTableUsers(){
+	public void loadTableUsers(){ //loads the users table from the database
 		
-		String[] cols = {"Username", "Password", "Type"};
+		String[] cols = {"Username", "Type"};
 		int count = JISS.db.queryCount("select count(*) from users");
 		
-		String[][] rows = new String[count - 1][3];
+		String[][] rows = new String[count - 1][2];
 		int i=0;
 		
-		ResultSet rs = JISS.db.getrs("select * from users where type != \"R\"");
+		ResultSet rs = JISS.db.getrs("select username,type from users where type != \"R\"");
 		try{
 			while(rs.next()){
-				for(int j=0; j<3; j++){
+				for(int j=0; j<2; j++){
 					rows[i][j] = rs.getString(j+1);
 				}
 				i++;
@@ -161,7 +161,7 @@ public class UsersRecord{
 		
 	}
 	
-	public void reloadTableUsers(){
+	public void reloadTableUsers(){ //reloads user table to show changes
 		
 		userManPanel.remove(sp);
 		loadTableUsers();

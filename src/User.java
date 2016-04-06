@@ -298,21 +298,21 @@ public class User{
 		return this;
 	}
 	
-	public void backFromUR(){
+	public void backFromUR(){ //when control goes from UsersRecord object to User
 		mainPanel.setVisible(true);
 		URPanel.setVisible(false);
 		panel.remove(URPanel);
 		URPanel = null;
 	}
 	
-	public void backFromCR(){
+	public void backFromCR(){//when control goes from CasesRecord object to User
 		mainPanel.setVisible(true);
 		CRPanel.setVisible(false);
 		panel.remove(CRPanel);
 		CRPanel = null;
 	}
 	
-	public void backFromCase(){
+	public void backFromCase(){ //when control goes from Case object to User
 		mainPanel.setVisible(true);
 		casePanel.setVisible(false);
 		panel.remove(casePanel);

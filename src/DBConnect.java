@@ -5,17 +5,16 @@ public class DBConnect {
 	private Statement st;
 	private ResultSet rs;
 	
-	public DBConnect(){
-		try{
+	public DBConnect() throws Exception{
+		
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/","sqluser","sqluser123");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/","sqluser","");
 			st = con.createStatement();
-		}catch(Exception ex){
-			System.out.println("Error : "+ ex);
-		}
+		
 	}
 	
-	public boolean checkDB(String dbname){
+	
+	public boolean checkDB(String dbname){ //checks whether a given database exists or needs to be created
 		try{
 			String query = "show databases";
 			rs = st.executeQuery(query);
@@ -36,7 +35,7 @@ public class DBConnect {
 		return false;
 	}
 	
-	public void query(String query){
+	public void query(String query){ //executes a query
 		try{
 			rs = st.executeQuery(query);
 			//System.out.println(query+ ": success");
@@ -46,7 +45,7 @@ public class DBConnect {
 		}
 	}
 	
-	public void update(String query){
+	public void update(String query){ //executes a data manipulation statement
 		try{
 			st.executeUpdate(query);
 		//	System.out.println(query+ ": success");
@@ -56,7 +55,7 @@ public class DBConnect {
 		}
 	}
 	
-	public ResultSet getrs(String query){ //get result set
+	public ResultSet getrs(String query){ //gets result set of a particular query
 		try{
 			rs = st.executeQuery(query);
 			//System.out.println(query+ ": success");
@@ -70,25 +69,7 @@ public class DBConnect {
 		return null;
 	}
 	
-	
-	public boolean checkTable(String tname, String dbname){
-		try{
-			String query = "show tables";
-			rs = st.executeQuery(query);
-			while(rs.next()){
-				String name = rs.getString("Tables_in_" + dbname);
-				if(name.equals(tname)){
-					return true;
-				}
-			}
-			
-		}catch(Exception ex){
-			System.out.println("Error : "+ ex);
-		}
-		return false;
-	}
-	
-	public int queryCount(String query){
+	public int queryCount(String query){ //executes a count query and returns the result
 		try{
 			rs = st.executeQuery(query);
 			//System.out.println(query+ ": success");
