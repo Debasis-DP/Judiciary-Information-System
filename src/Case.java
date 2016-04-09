@@ -47,7 +47,7 @@ public class Case{
 	private JTextField txtDefAddr;
 	private JTextField txtTypeCrime;
 	private JTextField txtLocation;
-	private JTextField txtDateCrime;
+	private JLabel lblDateCrime;
 	private JTextField txtArrestingOffcr;
 	private JTextField txtPresJudge;
 	private JTextField txtPublicPros;
@@ -64,7 +64,7 @@ public class Case{
 	
 	private JPanel hearingAssignPanel;
 	private JPanel viewPanel, updatePanel, adjournPanel, closePanel, historyPanel;
-	private JTextField txtDateArrest;
+	private JLabel lblDateArrest;
 	
 	private JButton btnAdjourn, btnUpdate;
 	private CasesRecord CR;
@@ -149,9 +149,22 @@ public class Case{
 		JButton btnGetVacantSlots = new JButton("Get vacant slots");
 		btnGetVacantSlots.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(JISS.getDate(txtDateHearing.getText()) == null){
+				Date dh = JISS.getDate(txtDateHearing.getText());
+				if(dh == null){
 					JOptionPane.showMessageDialog(panel, "Please enter valid date (dd/mm/yyyy)");
 					return;
+				}
+				
+				if(dateHearing == null){
+					if(dh.compareTo(dateArrest) < 0){
+						JOptionPane.showMessageDialog(panel, "Date of hearing cannot be earlier than date of arrest!");
+						return;
+					}
+				}else{
+					if(dh.compareTo(dateHearing) <= 0){
+						JOptionPane.showMessageDialog(panel, "Date of hearing cannot be earlier than/equal to date of previous hearing!");
+						return;
+					}
 				}
 				int[] slots = new int[3];
 				for(int i=0; i<3; i++)
@@ -372,14 +385,25 @@ public class Case{
 					return;
 				}
 				
+				Date dc = JISS.getDate(txtDateComp.getText());
+				if(!txtDateComp.getText().equals("") && dc == null && !status){
+					JOptionPane.showMessageDialog(panel, "Please enter valid date of completion(dd/mm/yyyy)!");
+					return;
+				}
+				if(dc != null && dc.compareTo(dateHearing) < 0){
+					JOptionPane.showMessageDialog(panel, "Expected date of completion cannot be earlier than date of next hearing!");
+					return;
+				}
+				
+				
 				if(!status && mode)
 					JISS.db.update("update cases set "+
 					"defName=\"" + txtDefName.getText() + "\", " +
 					"defAddr=\"" + txtDefAddr.getText() + "\", " +
 					"type=\"" + txtTypeCrime.getText() + "\", "+
-					"dateCrime=\"" + txtDateCrime.getText() + "\", "+
+				//	"dateCrime=\"" + txtDateCrime.getText() + "\", "+
 					"location=\"" + txtLocation.getText() + "\", "+
-					"dateArrest=\"" + txtDateArrest.getText() + "\", "+
+				//	"dateArrest=\"" + txtDateArrest.getText() + "\", "+
 					"dateComp=\"" + txtDateComp.getText() + "\", "+
 					"ao=\"" + txtArrestingOffcr.getText() + "\", "+
 					"pj=\"" + txtPresJudge.getText() + "\", " +
@@ -482,10 +506,9 @@ public class Case{
 		txtLocation.setBounds(255, 121, 174, 19);
 		viewPanel.add(txtLocation);
 		
-		txtDateCrime = new JTextField();
-		txtDateCrime.setColumns(10);
-		txtDateCrime.setBounds(255, 148, 114, 19);
-		viewPanel.add(txtDateCrime);
+		lblDateCrime = new JLabel();
+		lblDateCrime.setBounds(255, 148, 114, 19);
+		viewPanel.add(lblDateCrime);
 		
 		txtArrestingOffcr = new JTextField();
 		txtArrestingOffcr.setColumns(10);
@@ -543,10 +566,9 @@ public class Case{
 		lblDateOfArrest.setBounds(66, 177, 132, 15);
 		viewPanel.add(lblDateOfArrest);
 		
-		txtDateArrest = new JTextField();
-		txtDateArrest.setColumns(10);
-		txtDateArrest.setBounds(255, 171, 114, 19);
-		viewPanel.add(txtDateArrest);
+		lblDateArrest = new JLabel();
+		lblDateArrest.setBounds(255, 171, 114, 19);
+		viewPanel.add(lblDateArrest);
 		
 		JLabel lblJudgementSummary_1 = new JLabel("Judgement summary:");
 		lblJudgementSummary_1.setBounds(64, 363, 166, 15);
@@ -629,17 +651,17 @@ public class Case{
 			txtTypeCrime.setText(type);
 			txtLocation.setText(location);
 			txtArrestingOffcr.setText(arrestingOfficer);
-			txtDateCrime.setText(JISS.DtoS(dateCrime));
-			txtDateArrest.setText(JISS.DtoS(dateArrest));
+			lblDateCrime.setText(JISS.DtoS(dateCrime));
+			lblDateArrest.setText(JISS.DtoS(dateArrest));
 			lblDateStarting.setText(JISS.DtoS(dateStart));
-			
+			txtDateComp.setText(JISS.DtoS(dateExpctdCmpl));
 			txtDateComp.setEditable(!status && mode);
 			txtDefName.setEditable(!status && mode);
 			txtDefAddr.setEditable(!status && mode);
 			txtTypeCrime.setEditable(!status && mode);
 			txtLocation.setEditable(!status && mode);
-			txtDateCrime.setEditable(!status && mode);
-			txtDateArrest.setEditable(!status && mode);
+		//	txtDateCrime.setEditable(!status && mode);
+		//	txtDateArrest.setEditable(!status && mode);
 			txtArrestingOffcr.setEditable(!status && mode);
 			txtPresJudge.setEditable(!status && mode);
 			txtPublicPros.setEditable(!status && mode);

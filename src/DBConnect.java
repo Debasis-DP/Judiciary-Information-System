@@ -1,5 +1,7 @@
 import java.sql.*;
 
+import javax.swing.JOptionPane;
+
 public class DBConnect {
 	private Connection con;
 	private Statement st;
@@ -49,7 +51,10 @@ public class DBConnect {
 		try{
 			st.executeUpdate(query);
 		//	System.out.println(query+ ": success");
-		}catch(Exception ex){
+		}catch(DataTruncation ex){
+			JOptionPane.showMessageDialog(JISS.frame, "No changes made because some data field was too long.");
+		}
+		catch(Exception ex){
 			System.out.println("Error : "+ ex);
 			
 		}

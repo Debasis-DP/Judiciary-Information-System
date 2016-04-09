@@ -19,7 +19,7 @@ import javax.swing.JPasswordField;
 
 public class JISS {
 
-	private JFrame frame;
+	
 	private JTextField txtUsername;
 	private JPasswordField txtPassword;
 	private JPanel createRegistrarPanel, loginPanel;
@@ -35,6 +35,7 @@ public class JISS {
 	
 	public static DBConnect db;
 	
+	public static JFrame frame;
 	
 	/**
 	 * Launch the application.

@@ -472,6 +472,10 @@ public class CasesRecord{
 				JOptionPane.showMessageDialog(panel, "Please enter valid date (dd/mm/yyyy)!");
 				return;
 			}
+			else if(dateCrime.compareTo(dateArrest) > 0){
+				JOptionPane.showMessageDialog(panel, "Date of arrest cannot be earlier than date of crime!");
+				return;
+			}
 			int c = generateCIN();
 			current = new Case(c, txtDefName.getText(), txtDefAddr.getText(),
 				dateCrime, txtTypeCrime.getText(),txtLocation.getText(), txtArrestingOffcr.getText(), dateArrest);
