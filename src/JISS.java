@@ -68,7 +68,7 @@ public class JISS {
 			db = new DBConnect();
 		}catch(Exception e){
 			JOptionPane.showMessageDialog(null, "Database connection error. Please check the following:\nMySQL must be installed."
-					+ "\nUser 'sqluser' with no password must be created.\nExiting...");
+					+ "\nUser 'root' with no password must be created.\nExiting...");
 			return;
 		}
 		EventQueue.invokeLater(new Runnable() {
@@ -96,6 +96,9 @@ public class JISS {
 			db.update("create table adjs (CIN int(8), scheduled_date char(10), slot char(1), reason varchar(20)) ");
 			
 			db.update("create table lawyers (username varchar(20), no_of_views int(8))");
+                        db.update("ALTER TABLE `users`  ADD `sl_no` INT NOT NULL AUTO_INCREMENT  FIRST,  ADD   PRIMARY KEY  (`sl_no`)");
+                        db.update("ALTER TABLE `lawyers`  ADD `sl_no` INT NOT NULL AUTO_INCREMENT  FIRST,  ADD   PRIMARY KEY  (`sl_no`);");
+                        
 		}
 		else
 			db.query("use jiss");
@@ -155,7 +158,7 @@ public class JISS {
 					return;
 				}
 				
-				db.update("insert into users values (\"" + txtRegUsername.getText() + "\",\""  + String.valueOf(pwdReg_1.getPassword()) + "\", \"R\")");
+				db.update("insert into users(username,password,type) values (\"" + txtRegUsername.getText() + "\",\""  + String.valueOf(pwdReg_1.getPassword()) + "\", \"R\")");
 				createRegistrarPanel.setVisible(false);
 				loginPanel.setVisible(true);
 				

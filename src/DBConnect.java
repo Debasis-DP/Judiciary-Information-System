@@ -10,7 +10,7 @@ public class DBConnect {
 	public DBConnect() throws Exception{
 		
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/","sqluser","");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/","root","");
 			st = con.createStatement();
 		
 	}
@@ -18,7 +18,7 @@ public class DBConnect {
 	
 	public boolean checkDB(String dbname){ //checks whether a given database exists or needs to be created
 		try{
-			String query = "show databases";
+			String query = "SHOW databases";
 			rs = st.executeQuery(query);
 			
 			while(rs.next()){

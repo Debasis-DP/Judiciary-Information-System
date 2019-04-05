@@ -188,10 +188,10 @@ public class UsersRecord{
 		char t;
 		if(ch == 0) t = 'L';
 		else t = 'J';
-		JISS.db.update("insert into users values (\"" + txtUsername.getText() + "\", \"" + txtPassword.getText() + "\", \"" + t + "\")");
+		JISS.db.update("insert into users(username,password,type) values (\"" + txtUsername.getText() + "\", \"" + txtPassword.getText() + "\", \"" + t + "\")");
 		
 		if(t=='L')
-			JISS.db.update("insert into lawyers values (\""+ txtUsername.getText()+ "\", 0)");
+			JISS.db.update("insert into lawyers(username,no_of_views) values (\""+ txtUsername.getText()+ "\", 0)");
 		
 		cmbTypeUser.setSelectedIndex(0);
 		txtUsername.setText("");
