@@ -105,6 +105,12 @@ public class Case{
 		status = s;
 		judgeSum = j;
 	}
+        //Extension from Hearing
+        public Case(int CIN, Date schedule, char slot, String summary){
+            this.CIN = CIN;
+            dateHearing = schedule;
+            
+        }
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -206,7 +212,7 @@ public class Case{
 					JOptionPane.showMessageDialog(panel, "No slot selected!");
 					return;
 				}
-				JISS.db.update("insert into hearings values (" + CIN + ", \"" + txtDateHearing.getText() + "\", \"" + sl + "\", \"-\")");
+				JISS.db.update("insert into hearings(CIN,scheduled_date,slot,summary) values (" + CIN + ", \"" + txtDateHearing.getText() + "\", \"" + sl + "\", \"-\")");
 				
 				JISS.db.update("update cases set dateHearing=\"" + txtDateHearing.getText() + "\" where CIN = " + CIN);
 				JISS.db.update("update cases set dateStart=dateHearing where dateStart is null and CIN=" + CIN);
