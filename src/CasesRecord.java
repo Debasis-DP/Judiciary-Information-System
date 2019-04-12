@@ -243,7 +243,7 @@ public class CasesRecord{
 					JOptionPane.showMessageDialog(panel, "Please enter valid date (dd/mm/yyyy)!");
 					return;
 				}
-				String[] cols = {"CIN", "Defendant name", "Type", "Slot"};
+				String[] cols = {"CIN", "Defendant name", "Start Date", "Slot"};
 				int count = JISS.db.queryCount("select count(*) from cases where dateHearing=\"" + txtDateHearing.getText() + "\"");
 				//System.out.println(count);
 				String[][] rows = new String[count][4];
@@ -299,25 +299,36 @@ public class CasesRecord{
 				String[] cols = {"CIN", "Defendant name", "Starting date", "Type", "Status"};
 				int count = JISS.db.queryCount("select count(*) from cases where CIN=" + txtCIN.getText());
 				
-				String[][] rows = new String[count][5];
-				int i=0;
+                                    String[][] rows = new String[count][5];
+                                    int i=0;
+                                if(count > 0)
+                                {
+                                    ResultSet rs = JISS.db.getrs("select CIN,defName,dateStart,type,status from cases where CIN=" + txtCIN.getText());
+                                    try{
+                                            while(rs.next()){
+                                                    for(int j=0; j<4; j++){
+                                                            rows[i][j] = rs.getString(j+1);
+                                                    }
+                                                    if(rs.getString(5).equals("1"))
+                                                            rows[i][4] = "Closed";
+                                                    else
+                                                            rows[i][4] = "Pending";
+                                            }
+
+                                    tblQueryCases = new JTable(rows, cols);
+                                    }catch(Exception ex){}
+                                    reloadTableQuery();
+                                }
+				else
+                                {
+                                    
+                                    tblQueryCases = new JTable(rows, cols);
+                                    reloadTableQuery();
+                                    JOptionPane.showMessageDialog(panel, "No case exists for the given CIN!");
+                                    return;
+                                }
 				
-				ResultSet rs = JISS.db.getrs("select CIN,defName,dateStart,type,status from cases where CIN=" + txtCIN.getText());
-				try{
-					while(rs.next()){
-						for(int j=0; j<4; j++){
-							rows[i][j] = rs.getString(j+1);
-						}
-						if(rs.getString(5).equals("1"))
-							rows[i][4] = "Closed";
-						else
-							rows[i][4] = "Pending";
-					}
 				
-				tblQueryCases = new JTable(rows, cols);
-				}catch(Exception ex){}
-				
-				reloadTableQuery();
 			}
 		});
 		btnGo_2.setBounds(234, 26, 99, 25);
