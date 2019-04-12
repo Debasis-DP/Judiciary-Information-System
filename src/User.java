@@ -34,7 +34,7 @@ public class User{
 	public JPanel CRPanel, URPanel, casePanel;
 	
 	private JScrollPane sp;
-	
+	private int views;
 	public User(String u, String p, char t){
 		username = u;
 		password = p;
@@ -197,8 +197,21 @@ public class User{
 		lblNumberOfCases.setVisible(type == 'L');
 		lblNoOfViews = new JLabel("");
 		lblNoOfViews.setBounds(245, 77, 70, 15);
+                lblNoOfViews.setText(""+3);
 		mainPanel.add(lblNoOfViews);
-		
+		views = 0;
+                ResultSet rs = JISS.db.getrs("select no_of_views from lawyers where username = '"+ username + "'");
+                
+                try{
+                   
+                        while(rs.next()){
+                           views = rs.getInt(1);
+                            
+                        }
+                        
+                
+                }catch(Exception ex){}
+                
 		JButton btnView = new JButton("View");
 		btnView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -218,15 +231,19 @@ public class User{
 				case_.goToView();
 				
 				if(type == 'L'){
-					((Lawyer)getThis()).increaseCount();
+					((Lawyer)getThis()).increaseCount(++views);
 					JISS.db.update("update lawyers set no_of_views = no_of_views+1 where username = \""+ username + "\"");
 				}
 			}
 		});
 		btnView.setBounds(280, 410, 167, 25);
 		mainPanel.add(btnView);
-		lblNoOfViews.setVisible(type == 'L');
+		lblNoOfViews.setText(""+views);
+                lblNoOfViews.setVisible(type == 'L');
 		
+                System.out.println("username "+username);
+                System.out.println("views "+views);
+                
 		JLabel lblEnterOldPassword = new JLabel("Enter old password:");
 		lblEnterOldPassword.setBounds(35, 80, 186, 15);
 		pwdchangePanel.add(lblEnterOldPassword);
