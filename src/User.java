@@ -12,6 +12,17 @@ import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.awt.event.ActionEvent;
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author Debasis
+ */
+
 public class User{
 	
 	private String username, password;
@@ -241,9 +252,6 @@ public class User{
 		lblNoOfViews.setText(""+views);
                 lblNoOfViews.setVisible(type == 'L');
 		
-                System.out.println("username "+username);
-                System.out.println("views "+views);
-                
 		JLabel lblEnterOldPassword = new JLabel("Enter old password:");
 		lblEnterOldPassword.setBounds(35, 80, 186, 15);
 		pwdchangePanel.add(lblEnterOldPassword);

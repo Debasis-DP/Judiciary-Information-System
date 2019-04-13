@@ -20,6 +20,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
 
+/**
+ *
+ * @author Debasis
+ */
 public class Case{
 	
 	private String defName,
